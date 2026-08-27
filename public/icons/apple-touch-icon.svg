@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" fill="none">
+  <!-- Mobile home screen icon: full-bleed gradient, large droplet, no arcs -->
+  <!-- Background gradient fill -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="180" y2="180" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0B3B66"/>
+      <stop offset="100%" stop-color="#1268A5"/>
+    </linearGradient>
+    <linearGradient id="drop" x1="90" y1="30" x2="90" y2="150" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#64D8E8"/>
+      <stop offset="100%" stop-color="#5BBCEB"/>
+    </linearGradient>
+  </defs>
+  <rect width="180" height="180" fill="url(#bg)"/>
+  <!-- Large centered droplet — mobile icon is bolder, no clutter -->
+  <path d="M90 28 C90 28 52 76 52 102 C52 124.09 68.863 142 90 142 C111.137 142 128 124.09 128 102 C128 76 90 28 90 28Z"
+        fill="url(#drop)"/>
+  <!-- Single horizontal wave line at bottom of droplet — mobile distinctive mark -->
+  <path d="M68 118 Q79 112 90 118 Q101 124 112 118"
+        stroke="white" stroke-width="4" stroke-linecap="round" fill="none" opacity="0.5"/>
+</svg>

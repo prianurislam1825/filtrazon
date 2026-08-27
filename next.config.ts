@@ -1,7 +1,19 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
-  /* config options here */
-};
+  // Expose APP_MODE to client components
+  env: {
+    NEXT_PUBLIC_APP_MODE: process.env.APP_MODE ?? 'local',
+  },
 
-export default nextConfig;
+  images: {
+    remotePatterns: [],
+  },
+
+  experimental: {
+    turbopackFileSystemCacheForDev: false,
+    turbopackFileSystemCacheForBuild: false,
+  },
+}
+
+export default nextConfig

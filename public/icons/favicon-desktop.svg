@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <!-- Desktop favicon: navy square with droplet + signal arc -->
+  <rect width="32" height="32" rx="6" fill="#0B3B66"/>
+  <!-- Droplet body -->
+  <path d="M16 7 C16 7 10 14 10 18.5 C10 21.538 12.686 24 16 24 C19.314 24 22 21.538 22 18.5 C22 14 16 7 16 7Z" fill="#64D8E8"/>
+  <!-- WiFi arc top (connectivity indicator) — desktop shows signal arcs -->
+  <path d="M11 12 Q16 9.5 21 12" stroke="#5BBCEB" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.7"/>
+</svg>

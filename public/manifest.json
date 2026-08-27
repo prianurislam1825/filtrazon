@@ -1,0 +1,24 @@
+{
+  "name": "FILTRAZON — Smart Water Filtration System",
+  "short_name": "FILTRAZON",
+  "description": "Real-time IoT monitoring for portable water purification systems",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0B3B66",
+  "theme_color": "#0B3B66",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icons/apple-touch-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/favicon-desktop.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
