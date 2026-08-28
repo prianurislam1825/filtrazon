@@ -22,7 +22,7 @@ export default function HowItWorks() {
       emoji: '📡',
       num: '3',
       title: { id: 'Sensor Cek Keamanan',       en: 'Sensors Check Safety'        },
-      desc:  { id: 'Sensor otomatis mengecek apakah air sudah benar-benar aman — tingkat keasaman, kejernihan, dan lainnya.', en: 'Sensors automatically check if water is truly safe — acidity, clarity, and more.' },
+      desc:  { id: 'Sensor otomatis mengecek apakah air sudah benar-benar aman: tingkat keasaman, kejernihan, dan lainnya.', en: 'Sensors automatically check if water is truly safe: acidity, clarity, and more.' },
     },
     {
       emoji: '📱',

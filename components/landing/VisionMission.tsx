@@ -64,8 +64,8 @@ export default function VisionMission() {
               </h3>
               <p className="text-sm text-white/75 leading-relaxed">
                 {lang === 'id'
-                  ? 'Kami percaya setiap orang berhak mendapat air bersih yang aman — tidak peduli seberapa jauh lokasinya atau seberapa parah bencananya.'
-                  : 'We believe everyone deserves safe clean water — no matter how remote the location or how severe the disaster.'}
+                  ? 'Kami percaya setiap orang berhak mendapat air bersih yang aman, tidak peduli seberapa jauh lokasinya atau seberapa parah bencananya.'
+                  : 'We believe everyone deserves safe clean water, no matter how remote the location or how severe the disaster.'}
               </p>
             </div>
           </div>

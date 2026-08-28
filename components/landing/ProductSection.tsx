@@ -41,8 +41,8 @@ export default function ProductSection() {
     h1:      { id: 'FILTRAZON Water System',  en: 'FILTRAZON Water System' },
     sub:     { id: 'Portable · Tenaga Surya · Pantau Jarak Jauh', en: 'Portable · Solar Powered · Remote Monitoring' },
     desc:    {
-      id: 'Satu alat lengkap untuk menyaring air dan memastikan keamanannya — bisa dibawa ke mana saja, dipakai di daerah tanpa listrik, dan dipantau dari ponsel.',
-      en: 'One complete device to filter water and ensure its safety — portable, works without grid power, and monitored from your phone.',
+      id: 'Satu alat lengkap untuk menyaring air dan memastikan keamanannya. Bisa dibawa ke mana saja, dipakai di daerah tanpa listrik, dan dipantau dari ponsel.',
+      en: 'One complete device to filter water and ensure its safety. Portable, works without grid power, and monitored from your phone.',
     },
     included: [
       { id: 'Saring air kotor jadi bersih',     en: 'Filters dirty water clean'     },

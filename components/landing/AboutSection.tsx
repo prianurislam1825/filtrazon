@@ -35,7 +35,7 @@ export default function AboutSection() {
     h1:    { id: 'Alat Filtrasi Air',              en: 'Water Filtration Device'           },
     h2:    { id: 'yang Bisa Dipantau dari Ponsel', en: 'You Can Monitor from Your Phone'   },
     p1:    { id: 'FILTRAZON adalah alat penyaring air portabel yang dirancang khusus untuk membantu korban bencana mendapatkan air bersih yang aman.', en: 'FILTRAZON is a portable water purifier designed specifically to help disaster victims access safe, clean water.' },
-    p2:    { id: 'Alat ini bisa menyaring air kotor menjadi air bersih, sekaligus memantau apakah airnya sudah benar-benar aman untuk diminum — semua bisa dilihat langsung lewat ponsel atau laptop.', en: 'It filters dirty water into clean water, while monitoring whether the water is truly safe to drink — all visible directly from a phone or laptop.' },
+    p2:    { id: 'Alat ini bisa menyaring air kotor menjadi air bersih, sekaligus memantau apakah airnya sudah benar-benar aman untuk diminum. Semua bisa dilihat langsung lewat ponsel atau laptop.', en: 'It filters dirty water into clean water, while monitoring whether the water is truly safe to drink. All visible directly from a phone or laptop.' },
     p3:    { id: 'Bisa dipakai di daerah tanpa listrik PLN karena menggunakan panel surya, dan tetap berfungsi meski tidak ada sinyal internet.', en: 'Works in areas without grid electricity thanks to solar panels, and still functions even without internet signal.' },
     cards: [
       { Icon: Sun,        color:'#D4A017', bg:'#FFFBEB', border:'#FDE68A', text:{ id:'Bertenaga surya',          en:'Solar powered'           } },

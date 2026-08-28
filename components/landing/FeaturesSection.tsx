@@ -51,8 +51,8 @@ export default function FeaturesSection() {
           </h2>
           <p className="mt-3 text-gray-500 max-w-xl mx-auto text-sm">
             {lang === 'id'
-              ? 'Tidak perlu peralatan banyak. FILTRAZON mengurus semuanya — dari menyaring air hingga memantau keamanannya.'
-              : 'No need for multiple tools. FILTRAZON handles everything — from filtering water to monitoring its safety.'}
+              ? 'Tidak perlu peralatan banyak. FILTRAZON mengurus semuanya, dari menyaring air hingga memantau keamanannya.'
+              : 'No need for multiple tools. FILTRAZON handles everything, from filtering water to monitoring its safety.'}
           </p>
         </div>
 

@@ -11,8 +11,8 @@ export default function CtaSection() {
     label:   { id: 'Tertarik?',              en: 'Interested?'              },
     h1:      { id: 'Mau Tau Lebih Lanjut?',  en: 'Want to Know More?'       },
     desc:    {
-      id: 'Kami siap membantu — baik untuk kemitraan, pembelian, maupun kolaborasi penelitian. Hubungi kami langsung lewat WhatsApp atau email.',
-      en: 'We are ready to help — whether for partnership, purchase, or research collaboration. Contact us directly via WhatsApp or email.',
+      id: 'Kami siap membantu, baik untuk kemitraan, pembelian, maupun kolaborasi penelitian. Hubungi kami langsung lewat WhatsApp atau email.',
+      en: 'We are ready to help, whether for partnership, purchase, or research collaboration. Contact us directly via WhatsApp or email.',
     },
     wa:    { id: 'Chat WhatsApp',   en: 'WhatsApp Chat'   },
     email: { id: 'Kirim Email',     en: 'Send Email'      },

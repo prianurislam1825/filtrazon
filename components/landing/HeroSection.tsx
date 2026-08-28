@@ -19,7 +19,7 @@ export default function HeroSection() {
     badge:  { id: 'Teknologi Air Bersih untuk Bencana', en: 'Clean Water Technology for Disasters' },
     line1:  { id: 'Air Bersih',    en: 'Clean Water'  },
     line2:  { id: 'di Mana Saja', en: 'Anywhere'     },
-    sub:    { id: 'Alat filtrasi air portabel yang bisa dipantau dari ponsel — bahkan di lokasi bencana tanpa sinyal internet.', en: 'A portable water filtration device you can monitor from your phone — even in disaster areas without internet.' },
+    sub:    { id: 'Alat filtrasi air portabel yang bisa dipantau dari ponsel. Bahkan di lokasi bencana tanpa sinyal internet.', en: 'A portable water filtration device you can monitor from your phone. Even in disaster areas without internet.' },
     cta1:   { id: 'Hubungi Kami',          en: 'Contact Us'        },
     cta2:   { id: 'Pelajari Cara Kerjanya',en: 'See How It Works'  },
     scroll: { id: 'Scroll ke bawah',       en: 'Scroll down'       },

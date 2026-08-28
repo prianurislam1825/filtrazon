@@ -100,7 +100,7 @@ export default function LandingFooter() {
                 <div className="w-7 h-7 rounded-lg bg-pink-500/20 border border-pink-500/30 flex items-center justify-center shrink-0">
                   <Instagram size={13} className="text-pink-400" />
                 </div>
-                <span>@haikaladzdzaki.28</span>
+                <span>@filtrazon</span>
               </a>
             </div>
           </div>
