@@ -1,16 +1,32 @@
 'use client'
 
+import { Droplets, Target, CheckCircle2 } from 'lucide-react'
 import { useLang } from '@/lib/i18n/context'
 
 export default function VisionMission() {
   const { lang } = useLang()
 
   const MISSIONS = [
-    { id: 'Membantu korban bencana mendapat air bersih yang aman dengan cepat',              en: 'Help disaster victims access clean safe water quickly'                },
-    { id: 'Memberi tahu petugas jika kualitas air bermasalah secara otomatis',               en: 'Automatically alert staff if water quality has issues'                 },
-    { id: 'Tetap berfungsi meski tidak ada listrik atau sinyal internet',                    en: 'Keep working even without electricity or internet signal'              },
-    { id: 'Menyimpan semua data untuk keperluan laporan dan evaluasi',                       en: 'Store all data for reporting and evaluation purposes'                  },
-    { id: 'Membuat teknologi air bersih yang mudah digunakan siapa saja',                    en: 'Make clean water technology easy to use by anyone'                    },
+    {
+      id: 'Menyediakan filtrasi air portabel yang cepat dan aman di lokasi bencana.',
+      en: 'Provide fast and safe portable water filtration at disaster sites.',
+    },
+    {
+      id: 'Memanfaatkan energi surya untuk operasional mandiri di wilayah minim listrik.',
+      en: 'Utilize solar energy for independent operation in areas with limited electricity.',
+    },
+    {
+      id: 'Menghadirkan filtrasi dan monitoring pintar untuk menjamin kualitas air.',
+      en: 'Deliver smart filtration and monitoring to ensure water quality.',
+    },
+    {
+      id: 'Mendukung pemulihan pascabencana melalui akses air bersih yang berkelanjutan.',
+      en: 'Support post-disaster recovery through sustainable access to clean water.',
+    },
+    {
+      id: 'Mendorong inovasi praktis dan berkelanjutan yang berdampak luas bagi masyarakat.',
+      en: 'Drive practical and sustainable innovation with broad societal impact.',
+    },
   ]
 
   return (
@@ -28,14 +44,16 @@ export default function VisionMission() {
 
         <div className="grid md:grid-cols-2 gap-6">
 
-          {/* Visi — dark blue card */}
+          {/* Visi */}
           <div className="rounded-3xl p-8 text-white relative overflow-hidden"
             style={{ background: 'linear-gradient(135deg, #0077B6, #0096C7)' }}>
-            <div className="absolute top-0 right-0 text-[120px] leading-none opacity-10 pointer-events-none" aria-hidden="true">
-              💧
+            <div className="absolute -top-6 -right-6 opacity-10 pointer-events-none" aria-hidden="true">
+              <Droplets size={120} />
             </div>
             <div className="relative z-10">
-              <p className="text-4xl mb-4">🌊</p>
+              <div className="w-12 h-12 rounded-2xl bg-white/15 flex items-center justify-center mb-5">
+                <Droplets size={24} className="text-white" />
+              </div>
               <p className="text-xs font-black uppercase tracking-widest opacity-70 mb-2">
                 {lang === 'id' ? 'Visi' : 'Vision'}
               </p>
@@ -54,7 +72,9 @@ export default function VisionMission() {
 
           {/* Misi */}
           <div className="rounded-3xl border border-gray-100 bg-gray-50 p-8">
-            <p className="text-4xl mb-4">🎯</p>
+            <div className="w-12 h-12 rounded-2xl bg-green-100 flex items-center justify-center mb-5">
+              <Target size={24} className="text-[#43A047]" />
+            </div>
             <p className="text-xs font-black uppercase tracking-widest text-[#43A047] mb-2">
               {lang === 'id' ? 'Misi' : 'Mission'}
             </p>
@@ -64,7 +84,7 @@ export default function VisionMission() {
             <ul className="space-y-3">
               {MISSIONS.map((m, i) => (
                 <li key={i} className="flex items-start gap-3 text-sm text-gray-600 leading-relaxed">
-                  <span className="text-green-500 font-black text-base shrink-0 mt-0.5">✓</span>
+                  <CheckCircle2 size={16} className="text-green-500 shrink-0 mt-0.5" aria-hidden="true" />
                   {m[lang]}
                 </li>
               ))}
