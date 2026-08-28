@@ -9,7 +9,7 @@ const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] })
 const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title:       'FILTRAZON — Smart Water Filtration System',
+  title:       'FILTRAZON Smart Water Filtration System',
   description: 'Real-time IoT monitoring for portable water purification systems',
   icons: {
     icon:    [{ url: '/icons/favicon-desktop.svg', type: 'image/svg+xml' }],

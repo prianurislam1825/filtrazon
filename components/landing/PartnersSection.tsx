@@ -7,7 +7,7 @@ const PARTNERS = [
   { name:'SMAN 1 Surakarta',        logo:'/logo-smansa.png',   label:{ id:'SMAN 1 Surakarta',            en:'SMAN 1 Surakarta'             }, dark:false },
   { name:'SMA Muhammadiyah PK',     logo:'/logo-smamuhpk.png', label:{ id:'SMA Muhammadiyah PK Surakarta',en:'SMA Muhammadiyah PK Surakarta'}, dark:false },
   { name:'SMA Negeri 4 Surakarta',  logo:'/logo-sma4.png',     label:{ id:'SMA Negeri 4 Surakarta',       en:'SMA Negeri 4 Surakarta'       }, dark:false },
-  { name:'Solvia',                  logo:'/logo-solvia.png',   label:{ id:'Solvia',                       en:'Solvia'                       }, dark:true  },
+  { name:'Solvia',                  logo:'/logo-solvia.png',   label:{ id:'Solvia Nova',                       en:'Solvia Nova'                       }, dark:true  },
 ]
 
 // Scroll-reveal hook

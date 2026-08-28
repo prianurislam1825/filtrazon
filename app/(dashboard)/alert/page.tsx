@@ -206,13 +206,13 @@ export default function AlertPage() {
           </div>
         </div>
 
-        {/* Critical banner — most prominent */}
+        {/* Critical banner most prominent */}
         {critical > 0 && (
           <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-red-600 text-white shadow-lg"
             role="alert" aria-live="assertive">
             <span className="text-xl shrink-0">🚨</span>
             <p className="font-black text-sm">
-              {critical} {lang === 'id' ? 'alert kritis aktif' : 'critical alert(s) active'} —{' '}
+              {critical} {lang === 'id' ? 'alert kritis aktif' : 'critical alert(s) active'} {' '}
               {lang === 'id' ? 'tindakan segera diperlukan' : 'immediate action required'}
             </p>
           </div>
@@ -261,7 +261,7 @@ export default function AlertPage() {
           <div className="card">
             <EmptyState variant="no-data" title={T.noAlert[lang]}
               message={filter === 'active'
-                ? (lang === 'id' ? 'Tidak ada alert aktif — sistem berjalan normal.' : 'No active alerts — system running normally.')
+                ? (lang === 'id' ? 'Tidak ada alert aktif sistem berjalan normal.' : 'No active alerts system running normally.')
                 : (lang === 'id' ? 'Tidak ada alert yang sesuai filter.' : 'No alerts match the selected filter.')}
             />
           </div>

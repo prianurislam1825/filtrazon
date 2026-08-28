@@ -124,7 +124,7 @@ export default function ProductSection() {
                   style={{ animation:'spin 25s linear infinite' }} />
 
                 <Image
-                  src="/FILTRAZON.png"
+                  src="/3filtra.png"
                   alt="FILTRAZON Water System"
                   width={260}
                   height={260}
