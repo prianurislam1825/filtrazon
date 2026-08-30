@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard, History, Cpu, Bell,
-  Map, Settings, LogOut, ChevronLeft, ChevronRight,
+  Map, Settings, LogOut, ChevronLeft, ChevronRight, SlidersHorizontal,
 } from 'lucide-react'
 import { useState } from 'react'
 import { useLang } from '@/lib/i18n/context'
@@ -17,12 +17,13 @@ export default function Sidebar({ appMode = 'local' }: { appMode?: AppMode }) {
   const { lang }            = useLang()
 
   const NAV = [
-    { href: '/dashboard',  icon: LayoutDashboard, id: { id: 'Dashboard',  en: 'Dashboard' } },
-    { href: '/riwayat',    icon: History,          id: { id: 'Riwayat',   en: 'History'   } },
-    { href: '/perangkat',  icon: Cpu,              id: { id: 'Perangkat', en: 'Devices'   } },
-    { href: '/alert',      icon: Bell,             id: { id: 'Alert',     en: 'Alerts'    } },
-    { href: '/peta',       icon: Map,              id: { id: 'Peta',      en: 'Map'       } },
-    { href: '/pengaturan', icon: Settings,         id: { id: 'Pengaturan',en: 'Settings'  } },
+    { href: '/dashboard',  icon: LayoutDashboard,   id: { id: 'Dashboard',  en: 'Dashboard' } },
+    { href: '/riwayat',    icon: History,            id: { id: 'Riwayat',   en: 'History'   } },
+    { href: '/perangkat',  icon: Cpu,                id: { id: 'Perangkat', en: 'Devices'   } },
+    { href: '/kontrol',    icon: SlidersHorizontal,  id: { id: 'Kontrol',   en: 'Control'   } },
+    { href: '/alert',      icon: Bell,               id: { id: 'Alert',     en: 'Alerts'    } },
+    { href: '/peta',       icon: Map,                id: { id: 'Peta',      en: 'Map'       } },
+    { href: '/pengaturan', icon: Settings,           id: { id: 'Pengaturan',en: 'Settings'  } },
   ]
 
   return (

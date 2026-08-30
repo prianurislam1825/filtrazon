@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, History, Cpu, Bell, Menu } from 'lucide-react'
+import { LayoutDashboard, History, SlidersHorizontal, Bell, Menu } from 'lucide-react'
 import { useLang } from '@/lib/i18n/context'
 
 export default function MobileBottomNav() {
@@ -10,11 +10,11 @@ export default function MobileBottomNav() {
   const { lang } = useLang()
 
   const BOTTOM_NAV = [
-    { href: '/dashboard',  icon: LayoutDashboard, label: { id: 'Home',      en: 'Home'    } },
-    { href: '/riwayat',    icon: History,          label: { id: 'Riwayat',  en: 'History' } },
-    { href: '/perangkat',  icon: Cpu,              label: { id: 'Perangkat',en: 'Devices' } },
-    { href: '/alert',      icon: Bell,             label: { id: 'Alert',    en: 'Alerts'  } },
-    { href: '/more',       icon: Menu,             label: { id: 'Lainnya',  en: 'More'    } },
+    { href: '/dashboard',  icon: LayoutDashboard,  label: { id: 'Home',     en: 'Home'    } },
+    { href: '/riwayat',    icon: History,           label: { id: 'Riwayat', en: 'History' } },
+    { href: '/perangkat',  icon: SlidersHorizontal, label: { id: 'Kontrol', en: 'Control' } },
+    { href: '/alert',      icon: Bell,              label: { id: 'Alert',   en: 'Alerts'  } },
+    { href: '/more',       icon: Menu,              label: { id: 'Lainnya', en: 'More'    } },
   ]
 
   return (
