@@ -86,7 +86,7 @@ export default function LandingFooter() {
                 <div className="w-7 h-7 rounded-lg bg-green-500/20 border border-green-500/30 flex items-center justify-center shrink-0">
                   <MessageCircle size={13} className="text-green-400" />
                 </div>
-                <span>{lang === 'id' ? 'WhatsApp Haikal' : 'WhatsApp Haikal'}</span>
+                <span>WhatsApp</span>
               </a>
               <a href="mailto:filtrazonofficial@gmail.com"
                 className="flex items-center gap-2.5 text-xs text-white/50 hover:text-white transition-colors group">
@@ -95,12 +95,12 @@ export default function LandingFooter() {
                 </div>
                 <span>filtrazonofficial@gmail.com</span>
               </a>
-              <a href="https://www.instagram.com/haikaladzdzaki.28" target="_blank" rel="noopener noreferrer"
+              <a href="https://www.instagram.com/filtrazon?igsi=aHdrN2J0aTN6N214" target="_blank" rel="noopener noreferrer"
                 className="flex items-center gap-2.5 text-xs text-white/50 hover:text-white transition-colors group">
                 <div className="w-7 h-7 rounded-lg bg-pink-500/20 border border-pink-500/30 flex items-center justify-center shrink-0">
                   <Instagram size={13} className="text-pink-400" />
                 </div>
-                <span>@filtrazon</span>
+                <span>Instagram</span>
               </a>
             </div>
           </div>

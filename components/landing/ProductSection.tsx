@@ -116,7 +116,7 @@ export default function ProductSection() {
                 style={{ background:'radial-gradient(circle, #0096C7 30%, #43A047 70%)' }} />
 
               {/* Main card */}
-              <div className="relative w-full max-w-sm aspect-square rounded-3xl overflow-hidden border border-gray-100 shadow-2xl bg-gradient-to-br from-blue-50 via-cyan-50 to-green-50 flex items-center justify-center p-10
+              <div className="relative w-full max-w-sm aspect-square rounded-3xl overflow-hidden border border-gray-100 shadow-2xl bg-white flex items-center justify-center p-6
                               hover:scale-[1.02] transition-transform duration-500">
 
                 {/* Spinning dashed ring */}
@@ -124,11 +124,11 @@ export default function ProductSection() {
                   style={{ animation:'spin 25s linear infinite' }} />
 
                 <Image
-                  src="/3filtra.png"
+                  src="/produk-filtrazon.jpg"
                   alt="FILTRAZON Water System"
-                  width={260}
-                  height={260}
-                  className="object-contain drop-shadow-2xl animate-float"
+                  width={320}
+                  height={320}
+                  className="object-contain drop-shadow-xl animate-float rounded-2xl"
                 />
               </div>
 

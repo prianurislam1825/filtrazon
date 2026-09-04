@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { MessageCircle, Mail } from 'lucide-react'
+import { MessageCircle, Mail, Instagram } from 'lucide-react'
 import { useLang } from '@/lib/i18n/context'
 
 export default function CtaSection() {
@@ -14,8 +14,9 @@ export default function CtaSection() {
       id: 'Kami siap membantu, baik untuk kemitraan, pembelian, maupun kolaborasi penelitian. Hubungi kami langsung lewat WhatsApp atau email.',
       en: 'We are ready to help, whether for partnership, purchase, or research collaboration. Contact us directly via WhatsApp or email.',
     },
-    wa:    { id: 'Chat WhatsApp',   en: 'WhatsApp Chat'   },
-    email: { id: 'Kirim Email',     en: 'Send Email'      },
+    wa:    { id: 'WhatsApp',    en: 'WhatsApp'  },
+    ig:    { id: 'Instagram',   en: 'Instagram' },
+    email: { id: 'Kirim Email', en: 'Send Email' },
     note:  { id: 'Respon cepat lewat WhatsApp', en: 'Quick response via WhatsApp' },
   }
 
@@ -53,6 +54,12 @@ export default function CtaSection() {
             style={{ background: 'linear-gradient(135deg,#25D366,#128C7E)', color:'#fff' }}>
             <MessageCircle size={20} />
             {T.wa[lang]}
+          </a>
+          <a href="https://www.instagram.com/filtrazon?igsi=aHdrN2J0aTN6N214" target="_blank" rel="noopener noreferrer"
+            className="flex items-center gap-2.5 px-8 py-4 rounded-2xl font-bold text-base shadow-xl hover:scale-105 transition-all w-full sm:w-auto justify-center"
+            style={{ background: 'linear-gradient(135deg,#E1306C,#833AB4)', color:'#fff' }}>
+            <Instagram size={20} />
+            {T.ig[lang]}
           </a>
           <a href="mailto:filtrazonofficial@gmail.com"
             className="flex items-center gap-2.5 px-8 py-4 rounded-2xl font-bold text-base bg-white/15 border-2 border-white/30 text-white hover:bg-white/25 transition-colors w-full sm:w-auto justify-center">
