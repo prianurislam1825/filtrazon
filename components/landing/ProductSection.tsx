@@ -124,11 +124,11 @@ export default function ProductSection() {
                   style={{ animation:'spin 25s linear infinite' }} />
 
                 <Image
-                  src="/produk-filtrazon.jpg"
+                  src="/Produk.jpeg"
                   alt="FILTRAZON Water System"
-                  width={320}
-                  height={320}
-                  className="object-contain drop-shadow-xl animate-float rounded-2xl"
+                  width={400}
+                  height={400}
+                  className="object-cover w-full h-full rounded-2xl drop-shadow-xl animate-float"
                 />
               </div>
 
