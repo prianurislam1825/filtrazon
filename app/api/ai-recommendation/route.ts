@@ -45,17 +45,25 @@ export async function POST(request: NextRequest): Promise<Response> {
 
   // ── 1. Coba panggil OpenAI GPT-4o-mini jika API key tersedia ──
   if (apiKey) {
-    const systemPrompt = `Anda adalah FILTRAZON AI Advisor — asisten pakar teknik lingkungan dan sistem purifikasi air minum portabel IoT tanggap darurat bencana (FILTRAZON).
-Analisis telemetri sensor dan status hardware secara komprehensif, ilmiah, dan berikan langkah taktis operasional yang dapat langsung diaplikasikan oleh admin/operator di lapangan.
+    const systemPrompt = `Anda adalah FILTRAZON AI Advisor — asisten pakar teknik lingkungan, kimia air, dan sistem purifikasi air minum portabel IoT bertenaga surya untuk tanggap darurat bencana (FILTRAZON).
 
-Standar Baku Mutu:
-- pH normal: 6.5 - 8.5 (Kritis: < 6.0 atau > 9.0)
-- TDS: <= 300 ppm (Aman), 300 - 500 ppm (Waspada), > 500 ppm (Bahaya)
-- Turbidity: <= 5 NTU (Air minum murni), 5 - 100 NTU (Air bersih darurat), > 100 NTU (Keruh tinggi), > 500 NTU (Bahaya)
-- Flow Rate: Jika Pompa ON dan Flow <= 0.1 L/min (Anomali pipa/filter clogging). Normal > 0.5 L/min.
-- UV Sterilizer: Mematikan bakteri patogen. Wajib ON saat pompa mengalirkan air minum.
+Basis Riset & Standar Internasional/Nasional yang Wajib Dirujuk:
+1. Permenkes RI No. 2 Tahun 2023 (Standar Baku Mutu Kesehatan Lingkungan untuk Media Air Minum).
+2. WHO Guidelines for Drinking-water Quality (4th Edition, 2022).
+3. The Sphere Project: Humanitarian Charter and Minimum Standards in Disaster Response (WASH Chapter: 15 L/jiwa/hari, jarak < 500m, kekeruhan < 5 NTU).
+4. US EPA Drinking Water Regulations & NSF/ANSI Standard 55 (UV-C 254nm dosis >= 40 mJ/cm2).
 
-Gunakan bahasa ${lang === 'id' ? 'Indonesia' : 'English'} dengan format Markdown rapi.`
+Parameter Baku Mutu:
+- pH: 6.50 – 8.50 (Asam: korosif; Basa: pahit & kerak kalsium).
+- TDS: <= 300 ppm (Ideal), 300 – 500 ppm (Batas Wajar), > 500 ppm (Tinggi/Payau, wajib RO).
+- Kekeruhan: <= 1.0 – 5.0 NTU (Air Minum), 5 – 25 NTU (Darurat Bencana), > 100 NTU (Banjir, butuh pengendapan & backwash).
+- Flow Rate: Jika Pompa ON & Flow <= 0.1 L/min -> Clogging/dry-run!
+- UV Sterilizer: Wajib ON saat pompa mengalirkan air minum untuk eradikasi E. Coli & kista patogen.
+
+Tugas Anda:
+Jawab setiap pertanyaan pengguna secara komprehensif, ilmiah, berbasis data riset, dan korelasikan langsung dengan data telemetri sensor saat ini. Berikan langkah taktis operasional yang dapat langsung diaplikasikan oleh admin/operator lapangan.
+
+Gunakan bahasa ${lang === 'id' ? 'Indonesia' : 'English'} dengan format Markdown rapi dan terstruktur.`
 
     const telemetryContext = `Data Telemetri Sensor Terkini (${t.device_id ?? 'FILTRAZON-01'} - Seq #${t.seq ?? 0}):
 - pH Air: ${t.ph ?? 'N/A'}
@@ -68,8 +76,8 @@ Gunakan bahasa ${lang === 'id' ? 'Indonesia' : 'English'} dengan format Markdown
 - Sinyal LoRa (RSSI): ${t.rssi ?? 'N/A'} dBm`
 
     const userMessage = userPrompt
-      ? `${telemetryContext}\n\nPertanyaan Khusus Admin/Operator:\n${userPrompt}\n\nBerikan analisis mendalam dan rekomendasi berbasis data sensor di atas.`
-      : `${telemetryContext}\n\nBerikan analisis kelayakan air, evaluasi anomali sensor/hardware, langkah taktis operasional, dan saran keselamatan konsumsi.`
+      ? `${telemetryContext}\n\nPertanyaan Khusus Admin/Operator:\n"${userPrompt}"\n\nBerikan analisis mendalam, rujukan standar riset, dan rekomendasi berbasis data sensor di atas.`
+      : `${telemetryContext}\n\nBerikan analisis kelayakan air komprehensif, evaluasi anomali sensor/hardware, langkah taktis operasional, dan saran keselamatan konsumsi.`
 
     try {
       const openaiRes = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -84,8 +92,8 @@ Gunakan bahasa ${lang === 'id' ? 'Indonesia' : 'English'} dengan format Markdown
             { role: 'system', content: systemPrompt },
             { role: 'user', content: userMessage },
           ],
-          temperature: 0.4,
-          max_tokens: 1000,
+          temperature: 0.3,
+          max_tokens: 1200,
         }),
         signal: AbortSignal.timeout(12000),
       })
@@ -107,15 +115,15 @@ Gunakan bahasa ${lang === 'id' ? 'Indonesia' : 'English'} dengan format Markdown
     } catch {}
   }
 
-  // ── 2. Fallback cerdas jika OpenAI error / kuota habis ─────
+  // ── 2. Fallback cerdas berbasis riset ilmiah & NLP keyword search ─────
   const expertText = generateExpertRecommendation(t, userPrompt, lang)
   return Response.json({
     ok: true,
     recommendation: expertText,
     telemetry: t,
     timestamp: new Date().toISOString(),
-    model: 'FILTRAZON AI Expert Engine (Built-in)',
+    model: 'FILTRAZON Research-Backed AI Engine',
     source: 'expert-fallback',
-    quotaNotice: 'OpenAI API key terpasang di sistem. Saat saldo akun diisi di platform.openai.com, sistem akan otomatis beralih ke model GPT-4o-mini.',
+    quotaNotice: apiKey ? 'OpenAI API key terpasang di sistem. Saat kuota akun aktif, sistem akan otomatis memanfaatkan GPT-4o-mini.' : null,
   })
 }

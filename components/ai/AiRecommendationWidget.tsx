@@ -3,22 +3,37 @@
 import { useState, useEffect, useRef } from 'react'
 import {
   Sparkles, X, Send, Bot, RefreshCw, AlertTriangle,
-  CheckCircle2, ShieldAlert, Droplets, Gauge, Waves, Activity,
-  ChevronDown, Copy, Check, MessageSquare
+  CheckCircle2, Droplets, Gauge, Waves, Activity,
+  Copy, Check, MessageSquare, BookOpen, ChevronRight
 } from 'lucide-react'
-import { useSession } from 'next-auth/react'
+
+interface QuickPromptItem {
+  category: string
+  label: string
+  q: string
+}
+
+const QUICK_PROMPTS: QuickPromptItem[] = [
+  { category: 'Baku Mutu', label: '📜 Standar WHO & Permenkes', q: 'Bagaimana standar baku mutu air minum menurut Permenkes No. 2 Tahun 2023 dan WHO, dan apakah air saat ini layak konsumsi?' },
+  { category: 'Kekeruhan', label: '🌊 Penanganan Air Banjir / Keruh', q: 'Kekeruhan air sangat tinggi. Apa penyebab partikel suspensi dan bagaimana tahapan klarifikasi air keruh/banjir?' },
+  { category: 'TDS & Garam', label: '🧂 Solusi TDS & Rasa Asin', q: 'Mengapa nilai TDS tinggi dan bagaimana cara mereduksi partikel garam terlarut dalam air payau?' },
+  { category: 'UV & Bakteri', label: '🛡️ Sterilisasi UV & E. Coli', q: 'Berapa standar dosis sinar UV 254nm untuk membunuh bakteri E. Coli dan patogen diare?' },
+  { category: 'Maintenance', label: '🔧 Cara Backwash & Cuci Filter', q: 'Bagaimana prosedur backwashing tabung filter FRP dan jadwal penggantian cartridge sedimen serta karbon aktif?' },
+  { category: 'Tenaga Surya', label: '⚡ Tenaga Surya & Baterai', q: 'Bagaimana efisiensi sistem solar panel MPPT dan berapa lama baterai LiFePO4 mampu menggerakkan pompa saat mendung/malam?' },
+  { category: 'SOP Bencana', label: '🚨 Standar WASH Pengungsi', q: 'Berapa jatah air minimal per orang per hari di posko pengungsian menurut standar The Sphere Project?' },
+  { category: 'Pompa & Relay', label: '⚙️ Troubleshooting Pompa & Relay', q: 'Mengapa pompa relay 5V kadang tidak mau mati saat di-OFF pada ESP32 3.3V dan bagaimana cara mengatasinya?' },
+]
 
 export default function AiRecommendationWidget() {
-  const { data: session } = useSession()
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [recommendation, setRecommendation] = useState<string | null>(null)
-  const [model, setModel] = useState<string>('gpt-4o-mini')
-  const [source, setSource] = useState<string>('openai')
+  const [model, setModel] = useState<string>('FILTRAZON Research Engine')
   const [quotaNotice, setQuotaNotice] = useState<string | null>(null)
   const [prompt, setPrompt] = useState('')
   const [copied, setCopied] = useState(false)
   const [telemetry, setTelemetry] = useState<Record<string, unknown> | null>(null)
+  const [selectedCategory, setSelectedCategory] = useState<string>('Semua')
   const chatScrollRef = useRef<HTMLDivElement>(null)
 
   // Fetch AI recommendation
@@ -36,8 +51,7 @@ export default function AiRecommendationWidget() {
       const data = await res.json()
       if (data.ok) {
         setRecommendation(data.recommendation)
-        setModel(data.model ?? 'gpt-4o-mini')
-        setSource(data.source ?? 'openai')
+        setModel(data.model ?? 'FILTRAZON Research Engine')
         setQuotaNotice(data.quotaNotice ?? null)
         setTelemetry(data.telemetry ?? null)
       } else {
@@ -84,12 +98,11 @@ export default function AiRecommendationWidget() {
     setTimeout(() => setCopied(false), 2000)
   }
 
-  const QUICK_PROMPTS = [
-    { label: '🧪 Kelayakan Air', q: 'Analisis menyeluruh apakah air ini layak minum atau hanya untuk sanitasi?' },
-    { label: '⚠️ Diagnosa Kekeruhan', q: 'Kekeruhan air sangat tinggi. Apa penyebabnya dan bagaimana penanganannya?' },
-    { label: '⚙️ Optimasi Pompa & UV', q: 'Bagaimana pengaturan status pompa dan UV yang paling tepat saat ini?' },
-    { label: '🚨 SOP Tanggap Bencana', q: 'Berikan panduan darurat untuk distribusi air di posko pengungsian bencana.' },
-  ]
+  const categories = ['Semua', 'Baku Mutu', 'Kekeruhan', 'TDS & Garam', 'UV & Bakteri', 'Maintenance', 'Tenaga Surya', 'SOP Bencana', 'Pompa & Relay']
+
+  const filteredPrompts = selectedCategory === 'Semua'
+    ? QUICK_PROMPTS
+    : QUICK_PROMPTS.filter(p => p.category === selectedCategory)
 
   return (
     <>
@@ -107,9 +120,9 @@ export default function AiRecommendationWidget() {
             <Sparkles size={14} className="text-yellow-200 animate-spin" style={{ animationDuration: '4s' }} />
           </div>
           <span className="text-xs font-bold tracking-wide flex items-center gap-1.5">
-            AI Advisor
+            AI Water Advisor
             <span className="px-1.5 py-0.5 text-[9px] font-black uppercase rounded-full bg-white/20 text-white border border-white/30">
-              GPT
+              Research
             </span>
           </span>
         </button>
@@ -124,28 +137,28 @@ export default function AiRecommendationWidget() {
             className="fixed inset-0 bg-black/40 backdrop-blur-xs sm:hidden pointer-events-auto"
           />
 
-          <div className="pointer-events-auto w-full sm:w-[460px] max-h-[85vh] sm:max-h-[720px] bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl border border-gray-100 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-200">
+          <div className="pointer-events-auto w-full sm:w-[520px] max-h-[90vh] sm:max-h-[780px] bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl border border-gray-100 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-200">
             {/* Window Header */}
-            <div className="px-4 py-3.5 bg-gradient-to-r from-[#1268A5] to-[#1E3A5F] text-white flex items-center justify-between shrink-0">
+            <div className="px-4 py-3 bg-gradient-to-r from-[#1268A5] via-[#1A4F7C] to-[#15324A] text-white flex items-center justify-between shrink-0 shadow-sm">
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-xl bg-white/15 flex items-center justify-center border border-white/20 shadow-xs">
                   <Bot size={18} className="text-sky-300" />
                 </div>
                 <div>
                   <div className="flex items-center gap-1.5">
-                    <h3 className="text-xs font-bold leading-none">FILTRAZON AI Advisor</h3>
+                    <h3 className="text-xs font-bold leading-none">FILTRAZON AI Water Advisor</h3>
                     <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-sky-400/20 text-sky-200 border border-sky-300/20">
-                      {model.includes('gpt') ? 'GPT-4o Mini' : 'Expert AI'}
+                      WHO · Permenkes · IoT
                     </span>
                   </div>
-                  <p className="text-[10px] text-sky-200/80 mt-0.5">Analisis Cerdas Mutu Air & Rekomendasi Taktis</p>
+                  <p className="text-[10px] text-sky-200/80 mt-0.5">Riset Ilmiah, Analisis Telemetri & Panduan Taktis</p>
                 </div>
               </div>
 
               <div className="flex items-center gap-1">
                 <button
                   onClick={() => fetchRecommendation()}
-                  title="Analisis Ulang"
+                  title="Analisis Ulang Telemetri"
                   disabled={loading}
                   className="w-7 h-7 rounded-lg hover:bg-white/15 flex items-center justify-center text-white/80 hover:text-white transition-colors disabled:opacity-50"
                 >
@@ -163,100 +176,126 @@ export default function AiRecommendationWidget() {
 
             {/* Live Sensor Strip */}
             {telemetry && (
-              <div className="px-4 py-2 bg-sky-50/60 border-b border-sky-100 flex items-center justify-between gap-2 overflow-x-auto text-[10px] text-gray-600 shrink-0">
-                <span className="flex items-center gap-1 font-semibold text-gray-700">
+              <div className="px-4 py-2 bg-gradient-to-r from-sky-50 to-indigo-50/50 border-b border-sky-100 flex items-center justify-between gap-2 overflow-x-auto text-[10px] text-gray-600 shrink-0">
+                <span className="flex items-center gap-1 font-semibold text-gray-700 whitespace-nowrap">
                   <Droplets size={12} className="text-sky-600" /> pH: <strong>{String(telemetry.ph)}</strong>
                 </span>
-                <span className="flex items-center gap-1 font-semibold text-gray-700">
-                  <Gauge size={12} className="text-indigo-600" /> TDS: <strong>{String(telemetry.tds)}</strong>
+                <span className="flex items-center gap-1 font-semibold text-gray-700 whitespace-nowrap">
+                  <Gauge size={12} className="text-indigo-600" /> TDS: <strong>{String(telemetry.tds)} ppm</strong>
                 </span>
-                <span className="flex items-center gap-1 font-semibold text-gray-700">
-                  <Waves size={12} className="text-teal-600" /> Keruh: <strong>{String(telemetry.turbidity)}</strong>
+                <span className="flex items-center gap-1 font-semibold text-gray-700 whitespace-nowrap">
+                  <Waves size={12} className="text-teal-600" /> Keruh: <strong>{String(telemetry.turbidity)} NTU</strong>
                 </span>
-                <span className="flex items-center gap-1 font-semibold text-gray-700">
+                <span className="flex items-center gap-1 font-semibold text-gray-700 whitespace-nowrap">
                   <Activity size={12} className="text-emerald-600" /> Pompa: <strong>{telemetry.pump_status ? 'ON' : 'OFF'}</strong>
+                </span>
+                <span className="flex items-center gap-1 font-semibold text-gray-700 whitespace-nowrap">
+                  UV: <strong>{telemetry.uv_status ? 'ON' : 'OFF'}</strong>
                 </span>
               </div>
             )}
 
             {/* Quota Notice if applicable */}
             {quotaNotice && (
-              <div className="px-3.5 py-2 bg-amber-50 border-b border-amber-200/60 text-[10px] text-amber-800 flex items-center gap-2 shrink-0">
+              <div className="px-3.5 py-1.5 bg-amber-50 border-b border-amber-200/60 text-[10px] text-amber-800 flex items-center gap-2 shrink-0">
                 <AlertTriangle size={12} className="text-amber-600 shrink-0" />
                 <span className="leading-tight">{quotaNotice}</span>
               </div>
             )}
 
+            {/* Category Filter Tabs */}
+            <div className="px-3 pt-2.5 pb-1 border-b border-gray-100 bg-gray-50/70 shrink-0">
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1.5 scrollbar-none text-[10px]">
+                <span className="text-gray-400 font-bold uppercase tracking-wider flex items-center gap-1 mr-1">
+                  <BookOpen size={10} /> Riset:
+                </span>
+                {categories.map(cat => (
+                  <button
+                    key={cat}
+                    onClick={() => setSelectedCategory(cat)}
+                    className={`px-2 py-0.5 rounded-full whitespace-nowrap font-medium transition-all ${
+                      selectedCategory === cat
+                        ? 'bg-[#1268A5] text-white shadow-xs'
+                        : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200/70'
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Quick Prompt Chips */}
-            <div className="p-3 border-b border-gray-100 bg-gray-50/40 shrink-0">
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Pertanyaan Cepat:</p>
+            <div className="px-3 py-2 border-b border-gray-100 bg-gray-50/40 shrink-0 max-h-[110px] overflow-y-auto">
               <div className="flex flex-wrap gap-1.5">
-                {QUICK_PROMPTS.map((item, idx) => (
+                {filteredPrompts.map((item, idx) => (
                   <button
                     key={idx}
                     onClick={() => fetchRecommendation(item.q)}
                     disabled={loading}
-                    className="text-[11px] font-medium px-2.5 py-1 rounded-lg bg-white hover:bg-sky-50 hover:text-sky-700 hover:border-sky-200 border border-gray-200/70 text-gray-600 transition-all text-left disabled:opacity-50"
+                    className="group text-[11px] font-medium px-2.5 py-1 rounded-lg bg-white hover:bg-sky-50 hover:text-[#1268A5] hover:border-sky-200 border border-gray-200 text-gray-700 transition-all text-left flex items-center gap-1 shadow-2xs disabled:opacity-50"
                   >
-                    {item.label}
+                    <span>{item.label}</span>
+                    <ChevronRight size={10} className="opacity-0 group-hover:opacity-100 transition-opacity text-sky-500" />
                   </button>
                 ))}
               </div>
             </div>
 
             {/* Output Scroll Area */}
-            <div ref={chatScrollRef} className="flex-1 p-4 overflow-y-auto space-y-3 bg-[#FCFDFE] text-xs text-gray-700 leading-relaxed min-h-[220px]">
+            <div ref={chatScrollRef} className="flex-1 p-4 overflow-y-auto space-y-3 bg-[#FCFDFE] text-xs text-gray-700 leading-relaxed min-h-[260px]">
               {loading ? (
                 <div className="h-full flex flex-col items-center justify-center py-12 text-center text-gray-400 space-y-3">
-                  <div className="w-10 h-10 rounded-2xl bg-sky-50 border border-sky-100 flex items-center justify-center text-sky-600 animate-pulse">
+                  <div className="w-10 h-10 rounded-2xl bg-sky-50 border border-sky-100 flex items-center justify-center text-[#1268A5] animate-pulse shadow-sm">
                     <Sparkles size={20} className="animate-spin" style={{ animationDuration: '3s' }} />
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-gray-700">AI Sedang Menganalisis Telemetri...</p>
-                    <p className="text-[11px] text-gray-400 mt-0.5">Memproses pH, TDS, kekeruhan, dan parameter relay</p>
+                    <p className="text-xs font-bold text-gray-800">Menelusuri Basis Data Riset Ilmiah...</p>
+                    <p className="text-[11px] text-gray-400 mt-0.5">Mengkorelasikan WHO, Permenkes, dan parameter sensor telemetri</p>
                   </div>
                 </div>
               ) : recommendation ? (
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-[10px] text-gray-400 pb-1 border-b border-gray-100">
-                    <span className="flex items-center gap-1">
-                      <CheckCircle2 size={11} className="text-emerald-500" /> Analisis AI Selesai
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between text-[10px] text-gray-400 pb-1.5 border-b border-gray-100">
+                    <span className="flex items-center gap-1 text-emerald-600 font-semibold">
+                      <CheckCircle2 size={11} className="text-emerald-500" /> Analisis Riset Terverifikasi
                     </span>
                     <button
                       onClick={handleCopy}
-                      className="flex items-center gap-1 hover:text-gray-600 transition-colors"
+                      className="flex items-center gap-1 text-gray-500 hover:text-gray-800 transition-colors font-medium"
                     >
                       {copied ? <Check size={11} className="text-emerald-600" /> : <Copy size={11} />}
-                      {copied ? 'Tersalin' : 'Salin Teks'}
+                      {copied ? 'Tersalin' : 'Salin Laporan'}
                     </button>
                   </div>
-                  <div className="prose prose-xs max-w-none prose-headings:font-bold prose-headings:text-[#15324A] prose-strong:text-gray-800 prose-ul:my-1 prose-li:my-0.5 whitespace-pre-line">
+                  <div className="prose prose-xs max-w-none prose-headings:font-bold prose-headings:text-[#15324A] prose-strong:text-gray-900 prose-table:my-2 prose-th:bg-gray-50 prose-th:px-2 prose-th:py-1 prose-td:px-2 prose-td:py-1 prose-td:border prose-th:border whitespace-pre-line leading-relaxed">
                     {recommendation}
                   </div>
                 </div>
               ) : (
-                <div className="h-full flex flex-col items-center justify-center py-8 text-center text-gray-400">
-                  <MessageSquare size={24} className="text-gray-300 mb-2" />
-                  <p className="text-xs">Klik pertanyaan cepat di atas atau ketik pertanyaan.</p>
+                <div className="h-full flex flex-col items-center justify-center py-10 text-center text-gray-400 space-y-2">
+                  <MessageSquare size={26} className="text-gray-300" />
+                  <p className="text-xs font-semibold text-gray-600">Pilih topik riset di atas atau ajukan pertanyaan khusus.</p>
+                  <p className="text-[11px] text-gray-400 max-w-xs">Contoh: "Bagaimana standar baku mutu WHO?", "Cara cuci filter mampet", atau "Dosis sterilisasi UV".</p>
                 </div>
               )}
             </div>
 
             {/* Custom Question Input Bar */}
-            <form onSubmit={handleSend} className="p-3 border-t border-gray-100 bg-white shrink-0">
+            <form onSubmit={handleSend} className="p-3 border-t border-gray-100 bg-white shrink-0 shadow-xs">
               <div className="flex items-center gap-2">
                 <input
                   type="text"
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
-                  placeholder="Ketik pertanyaan untuk AI Advisor..."
+                  placeholder="Ketik pertanyaan untuk diteliti (misal: standar WHO, cara backwash, dosis UV)..."
                   disabled={loading}
                   className="flex-1 px-3 py-2 text-xs rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#5BBCEB] focus:border-transparent transition-all disabled:opacity-60"
                 />
                 <button
                   type="submit"
                   disabled={loading || !prompt.trim()}
-                  aria-label="Kirim"
+                  aria-label="Kirim Pertanyaan"
                   className="w-9 h-9 rounded-xl bg-[#1268A5] hover:bg-[#0E5486] text-white flex items-center justify-center transition-all disabled:opacity-40 disabled:cursor-not-allowed shrink-0 shadow-sm"
                 >
                   <Send size={14} />
