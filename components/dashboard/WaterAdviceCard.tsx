@@ -3,7 +3,7 @@
 import {
   CheckCircle2, AlertTriangle, XCircle,
   Droplets, Gauge, Waves, Activity,
-  Lightbulb, ThumbsUp,
+  Lightbulb, ThumbsUp, Sparkles,
 } from 'lucide-react'
 import type { StatusLevel } from '@/types'
 
@@ -252,9 +252,19 @@ export default function WaterAdviceCard({
             </p>
           </div>
         </div>
-        {allSafe && (
-          <CheckCircle2 size={20} className="text-green-500 shrink-0" />
-        )}
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => window.dispatchEvent(new CustomEvent('open-ai-advisor'))}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-[#1268A5] to-[#2185D0] text-white text-[11px] font-bold shadow-xs hover:shadow-md hover:scale-102 active:scale-98 transition-all"
+          >
+            <Sparkles size={13} className="text-yellow-300 animate-spin" style={{ animationDuration: '4s' }} />
+            <span>AI Advisor</span>
+          </button>
+          {allSafe && (
+            <CheckCircle2 size={20} className="text-green-500 shrink-0" />
+          )}
+        </div>
       </div>
 
       {/* Advice rows */}

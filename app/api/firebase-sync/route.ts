@@ -59,15 +59,15 @@ export async function GET(_request: NextRequest): Promise<Response> {
 
   // ── 2. Normalize to FirebaseReading ──────────────────────
   const fbReading: FirebaseReading = {
-    device_id:    raw.device_id,
-    gateway:      raw.gateway,
-    seq:          raw.seq,
-    uptime_ms:    raw.uptime_ms,
-    ph:           raw.ph,
-    tds:          raw.tds,
-    turbidity:    raw.turbidity,
-    flow_lpm:     raw.flow_lpm,
-    total_liters: raw.total_liters,
+    device_id:    raw.device_id ?? 'FILTRAZON-01',
+    gateway:      raw.gateway ?? 'GW-01',
+    seq:          raw.seq ?? 0,
+    uptime_ms:    raw.uptime_ms ?? 0,
+    ph:           raw.ph ?? 7.0,
+    tds:          raw.tds ?? 0,
+    turbidity:    raw.turbidity ?? 0,
+    flow_lpm:     raw.flow_lpm ?? 0,
+    total_liters: raw.total_liters ?? 0,
     pump_status:  normalizeBool(raw.pump_status),
     uv_status:    normalizeBool(raw.uv_status),
     relay1:       !!raw.relay1,
@@ -75,15 +75,26 @@ export async function GET(_request: NextRequest): Promise<Response> {
     relay3:       !!raw.relay3,
     relay4:       !!raw.relay4,
     flags:        raw.flags ?? 0,
-    battery:      raw.battery,
-    rssi:         raw.rssi,
-    snr:          raw.snr,
-    rx_ms:        raw.rx_ms,
+    battery:      raw.battery ?? -1,
+    rssi:         raw.rssi ?? 0,
+    snr:          raw.snr ?? 0,
+    rx_ms:        raw.rx_ms ?? Date.now(),
     fetched_at:   result.fetchedAt,
   }
 
   const reading   = toReading(fbReading)
-  const isNewSeq  = !insertedSeqs.has(fbReading.seq)
+  let isNewSeq    = !insertedSeqs.has(fbReading.seq)
+
+  if (isNewSeq && !isLocalMode()) {
+    try {
+      const { getLatestReading } = await import('@/lib/db/readings')
+      const latestDb = await getLatestReading(fbReading.device_id)
+      if (latestDb && latestDb.seq === fbReading.seq) {
+        insertedSeqs.add(fbReading.seq)
+        isNewSeq = false
+      }
+    } catch {}
+  }
 
   // ── 3. Always broadcast via SSE (relay status stays fresh) ─
   broadcastReading(reading)

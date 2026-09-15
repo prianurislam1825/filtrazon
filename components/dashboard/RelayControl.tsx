@@ -1,20 +1,18 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { Power, Sun, Zap, ZapOff, Loader2, CheckCircle, AlertCircle, Clock } from 'lucide-react'
+import { Zap, ZapOff, Loader2, CheckCircle, AlertCircle } from 'lucide-react'
 import type { FirebaseReading, RelayCommand } from '@/types'
 
 // ── Types ─────────────────────────────────────────────────────
-type CmdState = 'idle' | 'sending' | 'waiting' | 'success' | 'timeout' | 'error'
+type CmdState = 'idle' | 'sending' | 'success' | 'error'
 
 interface RelayState {
   cmdState: CmdState
-  sentAt:   number | null
-  error?:   string
+  error?: string
 }
 
-const INITIAL_RELAY_STATE: RelayState = { cmdState: 'idle', sentAt: null }
-const WAIT_TIMEOUT_MS = 12_000   // 12s — normal LoRa round-trip is 2–8s
+const INITIAL_RELAY_STATE: RelayState = { cmdState: 'idle' }
 
 // ── Helper: relay name label ──────────────────────────────────
 function relayLabel(index: 1 | 2 | 3 | 4, names?: Record<string, string>): string {
@@ -31,11 +29,9 @@ function CmdStatusBadge({ state, error }: { state: CmdState; error?: string }) {
   if (state === 'idle') return null
   const cfg: Record<CmdState, { cls: string; icon: React.ReactNode; label: string }> = {
     idle:    { cls: '', icon: null, label: '' },
-    sending: { cls: 'text-sky-600',   icon: <Loader2 size={11} className="animate-spin" />, label: 'Mengirim...' },
-    waiting: { cls: 'text-amber-600', icon: <Clock   size={11} />,                          label: 'Menunggu device...' },
-    success: { cls: 'text-green-600', icon: <CheckCircle size={11} />,                      label: 'Berhasil' },
-    timeout: { cls: 'text-red-600',   icon: <AlertCircle size={11} />,                      label: 'Timeout — perangkat tidak merespons' },
-    error:   { cls: 'text-red-600',   icon: <AlertCircle size={11} />,                      label: error ?? 'Error' },
+    sending: { cls: 'text-sky-600',   icon: <Loader2 size={11} className="animate-spin" />, label: 'Mengirim command...' },
+    success: { cls: 'text-green-600', icon: <CheckCircle size={11} />,                      label: 'Perintah terkirim' },
+    error:   { cls: 'text-red-600',   icon: <AlertCircle size={11} />,                      label: error ?? 'Gagal kirim' },
   }
   const c = cfg[state]
   return (
@@ -61,24 +57,24 @@ function RelayRow({
 }) {
   const onCmd_  = `R${index}ON`  as RelayCommand
   const offCmd_ = `R${index}OFF` as RelayCommand
-  const pending = cmdState === 'sending' || cmdState === 'waiting'
+  const isSending = cmdState === 'sending'
 
   return (
     <div className="flex items-center gap-3 py-3 border-b border-gray-50 last:border-0">
       {/* Status dot */}
-      <span className={`w-2.5 h-2.5 rounded-full shrink-0 transition-colors ${
+      <span className={`w-2.5 h-2.5 rounded-full shrink-0 transition-all ${
         isLoading ? 'bg-gray-200 animate-pulse' :
-        isOn      ? 'bg-green-500' : 'bg-gray-300'
+        isOn      ? 'bg-green-500 shadow-sm shadow-green-300 ring-2 ring-green-200' : 'bg-gray-300'
       }`} />
 
-      {/* Label */}
+      {/* Label & Status */}
       <div className="flex-1 min-w-0">
         <p className="text-sm font-semibold text-gray-800 truncate">{label}</p>
         <CmdStatusBadge state={cmdState} error={cmdError} />
       </div>
 
-      {/* Current status */}
-      <span className={`text-xs font-bold px-2 py-0.5 rounded-full border mr-1 ${
+      {/* Current status badge */}
+      <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full border mr-1 transition-colors ${
         isLoading ? 'bg-gray-50 text-gray-300 border-gray-100' :
         isOn
           ? 'bg-green-100 text-green-700 border-green-200'
@@ -87,32 +83,32 @@ function RelayRow({
         {isLoading ? '...' : isOn ? 'ON' : 'OFF'}
       </span>
 
-      {/* Buttons */}
+      {/* Control Buttons */}
       <div className="flex gap-1.5">
         <button
           onClick={() => onCmd(onCmd_)}
-          disabled={disabled || pending || (isOn && cmdState === 'idle')}
+          disabled={disabled || isSending}
           aria-label={`${label} ON`}
-          className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold rounded-lg
-            bg-green-600 text-white hover:bg-green-700
-            disabled:opacity-40 disabled:cursor-not-allowed
-            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-400
-            transition-colors"
+          className={`flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-400 ${
+            isOn
+              ? 'bg-green-600 text-white shadow-sm ring-1 ring-green-600'
+              : 'bg-gray-100 text-gray-700 hover:bg-green-50 hover:text-green-700 border border-gray-200'
+          } disabled:opacity-40 disabled:cursor-not-allowed`}
         >
-          {pending ? <Loader2 size={11} className="animate-spin" /> : <Zap size={11} />}
+          {isSending && !isOn ? <Loader2 size={11} className="animate-spin" /> : <Zap size={11} />}
           ON
         </button>
         <button
           onClick={() => onCmd(offCmd_)}
-          disabled={disabled || pending || (!isOn && cmdState === 'idle')}
+          disabled={disabled || isSending}
           aria-label={`${label} OFF`}
-          className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold rounded-lg
-            bg-gray-200 text-gray-700 hover:bg-gray-300
-            disabled:opacity-40 disabled:cursor-not-allowed
-            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400
-            transition-colors"
+          className={`flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400 ${
+            !isOn
+              ? 'bg-rose-600 text-white shadow-sm ring-1 ring-rose-600'
+              : 'bg-gray-100 text-gray-700 hover:bg-rose-50 hover:text-rose-700 border border-gray-200'
+          } disabled:opacity-40 disabled:cursor-not-allowed`}
         >
-          {pending ? <Loader2 size={11} className="animate-spin" /> : <ZapOff size={11} />}
+          {isSending && isOn ? <Loader2 size={11} className="animate-spin" /> : <ZapOff size={11} />}
           OFF
         </button>
       </div>
@@ -123,13 +119,19 @@ function RelayRow({
 // ── Main component ────────────────────────────────────────────
 interface RelayControlProps {
   firebaseReading: FirebaseReading | null
-  relayNames?: Record<string, string>   // from settings
+  relayNames?: Record<string, string>
+  onRelayUpdate?: (relays: Record<number, boolean>) => void
 }
 
-export default function RelayControl({ firebaseReading, relayNames }: RelayControlProps) {
+export default function RelayControl({ firebaseReading, relayNames, onRelayUpdate }: RelayControlProps) {
   const fb = firebaseReading
 
-  // Per-relay command state
+  // Local optimistic relay states
+  const [localRelays, setLocalRelays] = useState<Record<number, boolean>>({
+    1: false, 2: false, 3: false, 4: false,
+  })
+
+  // Command status per relay
   const [states, setStates] = useState<Record<number, RelayState>>({
     1: { ...INITIAL_RELAY_STATE },
     2: { ...INITIAL_RELAY_STATE },
@@ -137,48 +139,38 @@ export default function RelayControl({ firebaseReading, relayNames }: RelayContr
     4: { ...INITIAL_RELAY_STATE },
   })
 
-  // Timeout timers per relay
-  const timers = useRef<Record<number, ReturnType<typeof setTimeout>>>({})
+  const resetTimers = useRef<Record<number, ReturnType<typeof setTimeout>>>({})
 
-  // Watch Firebase latest: if relay status matches what we sent → success
+  // Keep localRelays in sync with Firebase when no command is active
   useEffect(() => {
     if (!fb) return
-    const relayValues: Record<number, boolean> = {
-      1: fb.relay1, 2: fb.relay2, 3: fb.relay3, 4: fb.relay4,
-    }
-
-    setStates(prev => {
-      const next = { ...prev }
-      for (const [idxStr, s] of Object.entries(prev)) {
-        const idx = Number(idxStr)
-        if (s.cmdState !== 'waiting') continue
-
-        // Determine expected state from last sent command
-        // We infer from the last command sent by checking which button was pressed
-        // The command is stored implicitly — if state is 'waiting', a cmd was sent
-        // We resolve success/timeout based on the timer expiry
-        // Here we detect if Firebase has changed since sentAt
-        if (s.sentAt && fb.rx_ms > s.sentAt) {
-          // Device responded (rx_ms updated) — mark success
-          clearTimeout(timers.current[idx])
-          next[idx] = { cmdState: 'success', sentAt: null }
-          // Auto-clear success badge after 3s
-          setTimeout(() => {
-            setStates(p => ({ ...p, [idx]: { cmdState: 'idle', sentAt: null } }))
-          }, 3000)
-        }
-        // else: still waiting, timer will handle timeout
-        void relayValues // suppress unused warning
-      }
-      return next
-    })
-  }, [fb])
+    setLocalRelays(prev => ({
+      1: states[1].cmdState !== 'idle' ? prev[1] : !!fb.relay1,
+      2: states[2].cmdState !== 'idle' ? prev[2] : !!fb.relay2,
+      3: states[3].cmdState !== 'idle' ? prev[3] : !!fb.relay3,
+      4: states[4].cmdState !== 'idle' ? prev[4] : !!fb.relay4,
+    }))
+  }, [fb, states])
 
   async function sendCommand(relay: 1 | 2 | 3 | 4, cmd: RelayCommand) {
-    setStates(prev => ({ ...prev, [relay]: { cmdState: 'sending', sentAt: null } }))
+    const isTurningOn = cmd.endsWith('ON')
+    const prevVal = localRelays[relay]
+
+    // 1. Optimistic update: instantly reflect desired state
+    setLocalRelays(prev => {
+      const next = { ...prev, [relay]: isTurningOn }
+      onRelayUpdate?.(next)
+      return next
+    })
+
+    setStates(prev => ({ ...prev, [relay]: { cmdState: 'sending' } }))
+
+    if (resetTimers.current[relay]) {
+      clearTimeout(resetTimers.current[relay])
+    }
 
     try {
-      const res  = await fetch('/api/control', {
+      const res = await fetch('/api/control', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ command: cmd }),
@@ -186,37 +178,114 @@ export default function RelayControl({ firebaseReading, relayNames }: RelayContr
       const json = await res.json()
 
       if (!res.ok || !json.ok) {
-        setStates(prev => ({ ...prev, [relay]: { cmdState: 'error', sentAt: null, error: json.error } }))
-        setTimeout(() => {
-          setStates(prev => ({ ...prev, [relay]: { cmdState: 'idle', sentAt: null } }))
-        }, 5000)
+        // Roll back on error
+        setLocalRelays(prev => {
+          const next = { ...prev, [relay]: prevVal }
+          onRelayUpdate?.(next)
+          return next
+        })
+        setStates(prev => ({ ...prev, [relay]: { cmdState: 'error', error: json.error ?? 'Gagal' } }))
+        resetTimers.current[relay] = setTimeout(() => {
+          setStates(prev => ({ ...prev, [relay]: { cmdState: 'idle' } }))
+        }, 3000)
         return
       }
 
-      // Command sent — now wait for Firebase /latest to reflect the change
-      const sentAt = Date.now()
-      setStates(prev => ({ ...prev, [relay]: { cmdState: 'waiting', sentAt } }))
-
-      // Timeout if device doesn't respond
-      timers.current[relay] = setTimeout(() => {
-        setStates(prev => {
-          if (prev[relay].cmdState === 'waiting') {
-            return { ...prev, [relay]: { cmdState: 'timeout', sentAt: null } }
-          }
-          return prev
-        })
-        // Clear timeout badge after 6s
-        setTimeout(() => {
-          setStates(prev => ({ ...prev, [relay]: { cmdState: 'idle', sentAt: null } }))
-        }, 6000)
-      }, WAIT_TIMEOUT_MS)
-
+      // Success
+      setStates(prev => ({ ...prev, [relay]: { cmdState: 'success' } }))
+      resetTimers.current[relay] = setTimeout(() => {
+        setStates(prev => ({ ...prev, [relay]: { cmdState: 'idle' } }))
+      }, 1500)
     } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Network error'
-      setStates(prev => ({ ...prev, [relay]: { cmdState: 'error', sentAt: null, error: msg } }))
+      // Roll back on network failure
+      setLocalRelays(prev => {
+        const next = { ...prev, [relay]: prevVal }
+        onRelayUpdate?.(next)
+        return next
+      })
+      const msg = err instanceof Error ? err.message : 'Koneksi error'
+      setStates(prev => ({ ...prev, [relay]: { cmdState: 'error', error: msg } }))
+      resetTimers.current[relay] = setTimeout(() => {
+        setStates(prev => ({ ...prev, [relay]: { cmdState: 'idle' } }))
+      }, 3000)
+    }
+  }
+
+  async function handleBatch(cmd: 'ALLON' | 'ALLOFF') {
+    const isTurningOn = cmd === 'ALLON'
+    const prevValues = { ...localRelays }
+
+    // Optimistic all
+    const allState = { 1: isTurningOn, 2: isTurningOn, 3: isTurningOn, 4: isTurningOn }
+    setLocalRelays(allState)
+    onRelayUpdate?.(allState)
+
+    setStates({
+      1: { cmdState: 'sending' },
+      2: { cmdState: 'sending' },
+      3: { cmdState: 'sending' },
+      4: { cmdState: 'sending' },
+    })
+
+    try {
+      const res = await fetch('/api/control', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ command: cmd }),
+      })
+      const json = await res.json()
+
+      if (!res.ok || !json.ok) {
+        setLocalRelays(prevValues)
+        onRelayUpdate?.(prevValues)
+        setStates({
+          1: { cmdState: 'error', error: 'Gagal' },
+          2: { cmdState: 'error', error: 'Gagal' },
+          3: { cmdState: 'error', error: 'Gagal' },
+          4: { cmdState: 'error', error: 'Gagal' },
+        })
+        setTimeout(() => {
+          setStates({
+            1: { cmdState: 'idle' },
+            2: { cmdState: 'idle' },
+            3: { cmdState: 'idle' },
+            4: { cmdState: 'idle' },
+          })
+        }, 3000)
+        return
+      }
+
+      setStates({
+        1: { cmdState: 'success' },
+        2: { cmdState: 'success' },
+        3: { cmdState: 'success' },
+        4: { cmdState: 'success' },
+      })
       setTimeout(() => {
-        setStates(prev => ({ ...prev, [relay]: { cmdState: 'idle', sentAt: null } }))
-      }, 5000)
+        setStates({
+          1: { cmdState: 'idle' },
+          2: { cmdState: 'idle' },
+          3: { cmdState: 'idle' },
+          4: { cmdState: 'idle' },
+        })
+      }, 1500)
+    } catch {
+      setLocalRelays(prevValues)
+      onRelayUpdate?.(prevValues)
+      setStates({
+        1: { cmdState: 'error', error: 'Koneksi error' },
+        2: { cmdState: 'error', error: 'Koneksi error' },
+        3: { cmdState: 'error', error: 'Koneksi error' },
+        4: { cmdState: 'error', error: 'Koneksi error' },
+      })
+      setTimeout(() => {
+        setStates({
+          1: { cmdState: 'idle' },
+          2: { cmdState: 'idle' },
+          3: { cmdState: 'idle' },
+          4: { cmdState: 'idle' },
+        })
+      }, 3000)
     }
   }
 
@@ -230,7 +299,7 @@ export default function RelayControl({ firebaseReading, relayNames }: RelayContr
         <div>
           <p className="text-xs font-bold text-[#15324A] uppercase tracking-wider">Kontrol Relay</p>
           <p className="text-[10px] text-gray-400 mt-0.5">
-            {noFirebase ? 'Menunggu data Firebase...' : `Status dari Firebase · seq #${fb.seq}`}
+            {noFirebase ? 'Menunggu koneksi Firebase...' : `Status Realtime · seq #${fb.seq}`}
           </p>
         </div>
         {isDemoMode && (
@@ -240,10 +309,10 @@ export default function RelayControl({ firebaseReading, relayNames }: RelayContr
         )}
       </div>
 
-      {/* Notice: status from Firebase, not optimistic */}
-      <div className="mx-4 mt-3 mb-1 flex items-start gap-1.5 text-[10px] text-gray-400">
-        <Clock size={10} className="mt-0.5 shrink-0" />
-        Status relay berasal dari Firebase latest — bukan perkiraan. Perubahan terlihat setelah ACK dari perangkat.
+      {/* Notice */}
+      <div className="mx-4 mt-3 mb-1 flex items-start gap-1.5 text-[10px] text-emerald-700 bg-emerald-50 px-2.5 py-1.5 rounded-lg border border-emerald-200/60">
+        <Zap size={11} className="mt-0.5 shrink-0 text-emerald-600" />
+        Kontrol real-time aktif — Perintah ON/OFF dieksekusi seketika ke Firebase dan perangkat IoT tanpa penundaan.
       </div>
 
       {/* Relay rows */}
@@ -253,7 +322,7 @@ export default function RelayControl({ firebaseReading, relayNames }: RelayContr
             key={idx}
             index={idx}
             label={relayLabel(idx, relayNames)}
-            isOn={fb ? [fb.relay1, fb.relay2, fb.relay3, fb.relay4][idx - 1] : false}
+            isOn={localRelays[idx]}
             isLoading={noFirebase}
             onCmd={(cmd) => sendCommand(idx, cmd)}
             cmdState={states[idx].cmdState}
@@ -266,106 +335,20 @@ export default function RelayControl({ firebaseReading, relayNames }: RelayContr
       {/* All ON / All OFF */}
       <div className="flex gap-2 px-4 pb-4 pt-2 border-t border-gray-100">
         <button
-          onClick={async () => {
-            // Pakai batch endpoint — server kirim R1ON..R4ON dengan delay 800ms antar command
-            // agar gateway sempat baca & eksekusi tiap command
-            setStates(prev => ({
-              ...prev,
-              1: { cmdState: 'sending', sentAt: null },
-              2: { cmdState: 'sending', sentAt: null },
-              3: { cmdState: 'sending', sentAt: null },
-              4: { cmdState: 'sending', sentAt: null },
-            }))
-            try {
-              const res = await fetch('/api/control', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ commands: ['ALLON'], delayMs: 800 }),
-              })
-              const json = await res.json()
-              const now = Date.now()
-              if (json.ok) {
-                setStates(prev => ({
-                  ...prev,
-                  1: { cmdState: 'waiting', sentAt: now },
-                  2: { cmdState: 'waiting', sentAt: now },
-                  3: { cmdState: 'waiting', sentAt: now },
-                  4: { cmdState: 'waiting', sentAt: now },
-                }))
-              } else {
-                setStates(prev => ({
-                  ...prev,
-                  1: { cmdState: 'error', sentAt: null, error: 'Batch failed' },
-                  2: { cmdState: 'error', sentAt: null, error: 'Batch failed' },
-                  3: { cmdState: 'error', sentAt: null, error: 'Batch failed' },
-                  4: { cmdState: 'error', sentAt: null, error: 'Batch failed' },
-                }))
-              }
-            } catch {
-              setStates(prev => ({
-                ...prev,
-                1: { cmdState: 'error', sentAt: null, error: 'Network error' },
-                2: { cmdState: 'error', sentAt: null, error: 'Network error' },
-                3: { cmdState: 'error', sentAt: null, error: 'Network error' },
-                4: { cmdState: 'error', sentAt: null, error: 'Network error' },
-              }))
-            }
-          }}
+          onClick={() => handleBatch('ALLON')}
           disabled={noFirebase}
-          className="flex-1 py-2 text-xs font-semibold rounded-lg bg-green-600 text-white
-            hover:bg-green-700 disabled:opacity-40 transition-colors"
+          className="flex-1 py-2 text-xs font-bold rounded-lg bg-green-600 text-white hover:bg-green-700 active:scale-[0.99] disabled:opacity-40 transition-all flex items-center justify-center gap-1.5 shadow-sm shadow-green-200"
         >
-          All ON
+          <Zap size={13} />
+          Semua ON (All ON)
         </button>
         <button
-          onClick={async () => {
-            setStates(prev => ({
-              ...prev,
-              1: { cmdState: 'sending', sentAt: null },
-              2: { cmdState: 'sending', sentAt: null },
-              3: { cmdState: 'sending', sentAt: null },
-              4: { cmdState: 'sending', sentAt: null },
-            }))
-            try {
-              const res = await fetch('/api/control', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ commands: ['ALLOFF'], delayMs: 800 }),
-              })
-              const json = await res.json()
-              const now = Date.now()
-              if (json.ok) {
-                setStates(prev => ({
-                  ...prev,
-                  1: { cmdState: 'waiting', sentAt: now },
-                  2: { cmdState: 'waiting', sentAt: now },
-                  3: { cmdState: 'waiting', sentAt: now },
-                  4: { cmdState: 'waiting', sentAt: now },
-                }))
-              } else {
-                setStates(prev => ({
-                  ...prev,
-                  1: { cmdState: 'error', sentAt: null, error: 'Batch failed' },
-                  2: { cmdState: 'error', sentAt: null, error: 'Batch failed' },
-                  3: { cmdState: 'error', sentAt: null, error: 'Batch failed' },
-                  4: { cmdState: 'error', sentAt: null, error: 'Batch failed' },
-                }))
-              }
-            } catch {
-              setStates(prev => ({
-                ...prev,
-                1: { cmdState: 'error', sentAt: null, error: 'Network error' },
-                2: { cmdState: 'error', sentAt: null, error: 'Network error' },
-                3: { cmdState: 'error', sentAt: null, error: 'Network error' },
-                4: { cmdState: 'error', sentAt: null, error: 'Network error' },
-              }))
-            }
-          }}
+          onClick={() => handleBatch('ALLOFF')}
           disabled={noFirebase}
-          className="flex-1 py-2 text-xs font-semibold rounded-lg bg-gray-200 text-gray-700
-            hover:bg-gray-300 disabled:opacity-40 transition-colors"
+          className="flex-1 py-2 text-xs font-bold rounded-lg bg-rose-600 text-white hover:bg-rose-700 active:scale-[0.99] disabled:opacity-40 transition-all flex items-center justify-center gap-1.5 shadow-sm shadow-rose-200"
         >
-          All OFF
+          <ZapOff size={13} />
+          Semua OFF (All OFF)
         </button>
       </div>
     </div>

@@ -3,6 +3,7 @@
 import Sidebar from './Sidebar'
 import MobileBottomNav from './MobileBottomNav'
 import TopNavbar from './TopNavbar'
+import AiRecommendationWidget from '@/components/ai/AiRecommendationWidget'
 import type { ConnectionStatus, AppMode } from '@/types'
 
 interface AppShellProps {
@@ -45,6 +46,9 @@ export default function AppShell({
 
       {/* Mobile bottom navigation */}
       <MobileBottomNav />
+
+      {/* AI Recommendation Floating Widget */}
+      <AiRecommendationWidget />
     </div>
   )
 }

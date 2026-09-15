@@ -31,7 +31,7 @@ export default function KontrolPage() {
       const json = await res.json()
       if (json.ok && json.firebase) {
         const fb: FirebaseReading = json.firebase
-        setFbReading(fb)
+        setFbReading(prev => ({ ...prev, ...fb }))
         setLastUpdate(fb.fetched_at)
         setConnStatus(evaluateConnectionStatus(fb.fetched_at))
       } else {
@@ -44,11 +44,70 @@ export default function KontrolPage() {
     }
   }, [])
 
+  // ── SSE realtime listener ──────────────────────────────
+  useEffect(() => {
+    let es: EventSource | null = null
+    try {
+      es = new EventSource('/api/live')
+      es.addEventListener('reading', (e: MessageEvent) => {
+        try {
+          const reading = JSON.parse(e.data)
+          setFbReading(prev => ({
+            ...prev,
+            device_id:    reading.device_id,
+            gateway:      reading.gateway_id ?? reading.gateway ?? 'GW-01',
+            seq:          reading.seq,
+            uptime_ms:    reading.uptime_ms,
+            ph:           reading.ph,
+            tds:          reading.tds,
+            turbidity:    reading.turbidity,
+            flow_lpm:     reading.flow_lpm,
+            total_liters: reading.total_liters,
+            pump_status:  reading.pump_status,
+            uv_status:    reading.uv_status,
+            relay1:       reading.relay1,
+            relay2:       reading.relay2,
+            relay3:       reading.relay3,
+            relay4:       reading.relay4,
+            flags:        reading.flags,
+            battery:      reading.battery,
+            rssi:         reading.rssi,
+            snr:          reading.snr,
+            rx_ms:        reading.rx_ms,
+            fetched_at:   reading.received_at,
+          }))
+          setLastUpdate(reading.received_at)
+          setConnStatus(evaluateConnectionStatus(reading.received_at))
+          setLoading(false)
+        } catch {}
+      })
+    } catch {}
+
+    return () => {
+      es?.close()
+    }
+  }, [])
+
   useEffect(() => {
     poll()
     pollRef.current = setInterval(poll, POLL_MS)
     return () => { if (pollRef.current) clearInterval(pollRef.current) }
   }, [poll])
+
+  const handleRelayUpdate = useCallback((relays: Record<number, boolean>) => {
+    setFbReading(prev => {
+      if (!prev) return prev
+      return {
+        ...prev,
+        relay1: relays[1],
+        relay2: relays[2],
+        relay3: relays[3],
+        relay4: relays[4],
+        pump_status: relays[1],
+        uv_status: relays[2],
+      }
+    })
+  }, [])
 
   return (
     <AppShell connectionStatus={connStatus}>
@@ -93,7 +152,7 @@ export default function KontrolPage() {
             <span className="text-sm">Menghubungkan ke Firebase...</span>
           </div>
         ) : (
-          <RelayControl firebaseReading={fbReading} />
+          <RelayControl firebaseReading={fbReading} onRelayUpdate={handleRelayUpdate} />
         )}
 
         {/* Current status table */}

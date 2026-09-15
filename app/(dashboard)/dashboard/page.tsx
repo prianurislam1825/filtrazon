@@ -20,6 +20,7 @@ import {
 } from '@/lib/thresholds'
 
 function formatUptime(ms: number): string {
+  if (!ms || isNaN(ms) || ms <= 0) return '0h 0m'
   const h = Math.floor(ms / 3_600_000)
   const m = Math.floor((ms % 3_600_000) / 60_000)
   if (h > 24) return `${Math.floor(h / 24)}d ${h % 24}h`

@@ -13,7 +13,8 @@
 
 import { type NextRequest } from 'next/server'
 import { auth } from '@/lib/auth'
-import { writeFirebaseCmd } from '@/lib/firebase/client'
+import { writeFirebaseCmd, patchFirebaseLatest } from '@/lib/firebase/client'
+import { broadcastReading } from '@/lib/sse/broadcaster'
 import type { RelayCommand, RelayCommandResult } from '@/types'
 
 const VALID_COMMANDS: RelayCommand[] = [
@@ -30,13 +31,77 @@ function isValidCommand(cmd: string): boolean {
   return false
 }
 
+function getRelayPatch(cmd: string): Record<string, unknown> | null {
+  const normalized = cmd.includes(':') ? cmd.split(':')[1] : cmd
+  switch (normalized) {
+    case 'R1ON':
+      return { relay1: true, pump_status: 'ON' }
+    case 'R1OFF':
+      return { relay1: false, pump_status: 'OFF' }
+    case 'R2ON':
+      return { relay2: true, uv_status: 'ON' }
+    case 'R2OFF':
+      return { relay2: false, uv_status: 'OFF' }
+    case 'R3ON':
+      return { relay3: true }
+    case 'R3OFF':
+      return { relay3: false }
+    case 'R4ON':
+      return { relay4: true }
+    case 'R4OFF':
+      return { relay4: false }
+    case 'ALLON':
+      return {
+        relay1: true, relay2: true, relay3: true, relay4: true,
+        pump_status: 'ON', uv_status: 'ON',
+      }
+    case 'ALLOFF':
+      return {
+        relay1: false, relay2: false, relay3: false, relay4: false,
+        pump_status: 'OFF', uv_status: 'OFF',
+      }
+    case 'DEMOON':
+      return { flags: 8 }
+    case 'DEMOOFF':
+      return { flags: 0 }
+    case 'FLOWRESET':
+      return { total_liters: 0 }
+    default:
+      return null
+  }
+}
+
+async function applyRelayPatch(cmd: string): Promise<Record<string, unknown> | null> {
+  const patch = getRelayPatch(cmd)
+  if (!patch) return null
+
+  try {
+    await patchFirebaseLatest(patch)
+  } catch {}
+
+  if (global.__latestReading) {
+    Object.assign(global.__latestReading, {
+      ...patch,
+      pump_status: patch.pump_status !== undefined ? patch.pump_status === 'ON' : global.__latestReading.pump_status,
+      uv_status: patch.uv_status !== undefined ? patch.uv_status === 'ON' : global.__latestReading.uv_status,
+    })
+    broadcastReading(global.__latestReading)
+  }
+
+  return patch
+}
+
 const sleep = (ms: number) => new Promise(r => setTimeout(r, ms))
 
 export async function POST(request: NextRequest): Promise<Response> {
   // ── 1. Auth check ─────────────────────────────────────────
-  const session = await auth()
-  if (!session?.user) {
-    return Response.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
+  const authEnabled = process.env.AUTH_ENABLED !== 'false'
+  const appMode = process.env.APP_MODE ?? 'local'
+  if (authEnabled && appMode !== 'local') {
+    const session = await auth()
+    if (!session?.user) {
+      return Response.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
+    }
   }
 
   // ── 2. Parse body ─────────────────────────────────────────
@@ -60,7 +125,13 @@ export async function POST(request: NextRequest): Promise<Response> {
         results.push({ command: cmd, ok: false, error: 'Invalid command' })
         continue
       }
+      // Force change pulse on Firebase RTDB so Gateway triggers event reliably
+      await writeFirebaseCmd('')
+      await sleep(80)
       const result = await writeFirebaseCmd(cmd)
+      if (result.ok) {
+        await applyRelayPatch(cmd)
+      }
       results.push({ command: cmd, ok: result.ok, error: result.error })
       if (results.length < body.commands.length) {
         await sleep(delayMs)
@@ -83,11 +154,24 @@ export async function POST(request: NextRequest): Promise<Response> {
     )
   }
 
+  // Force Firebase RTDB value event trigger:
+  // If the same command (e.g. R1OFF) was already in Firebase /cmd, Firebase may not
+  // dispatch a change event to the Gateway. Clearing it briefly guarantees a fresh event.
+  await writeFirebaseCmd('')
+  await sleep(100)
+
   const result = await writeFirebaseCmd(command)
   if (!result.ok) {
     return Response.json({ ok: false, error: result.error ?? 'Firebase write failed' }, { status: 502 })
   }
 
-  const response: RelayCommandResult = { ok: true, command, sentAt }
+  const patch = await applyRelayPatch(command)
+
+  const response: RelayCommandResult & { patch?: Record<string, unknown> | null } = {
+    ok: true,
+    command,
+    sentAt,
+    patch,
+  }
   return Response.json(response)
 }

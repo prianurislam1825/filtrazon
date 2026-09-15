@@ -332,14 +332,14 @@ export default function RiwayatPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {rows.map(row => <DesktopRow key={row.id} row={row} lang={lang} />)}
+                  {rows.map((row, idx) => <DesktopRow key={`${row.id}-${row.seq}-${row.received_at || idx}`} row={row} lang={lang} />)}
                 </tbody>
               </table>
             </div>
 
             {/* Mobile cards */}
             <div className="md:hidden divide-y divide-gray-50">
-              {rows.map(row => <MobileCard key={row.id} row={row} lang={lang} />)}
+              {rows.map((row, idx) => <MobileCard key={`${row.id}-${row.seq}-${row.received_at || idx}`} row={row} lang={lang} />)}
             </div>
 
             {/* Pagination */}

@@ -30,8 +30,8 @@ function DesktopTable({ rows, lang }: { rows: TelemetryRow[]; lang: 'id'|'en' })
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-50">
-          {rows.map(row => (
-            <tr key={row.id} className="hover:bg-gray-50/50 transition-colors">
+          {rows.map((row, idx) => (
+            <tr key={`${row.id}-${row.seq}-${row.received_at || idx}`} className="hover:bg-gray-50/50 transition-colors">
               <td className="px-4 py-2.5 font-mono text-gray-600 whitespace-nowrap">{formatTime(row.received_at)}</td>
               <td className="px-4 py-2.5 text-gray-500">#{row.seq}</td>
               <td className="px-4 py-2.5 font-medium text-gray-800">{row.ph.toFixed(1)}</td>
@@ -121,7 +121,7 @@ export default function TelemetryTable({ rows, loading, lang = 'id' }: Telemetry
         <DesktopTable rows={rows} lang={lang} />
       </div>
       <div className="md:hidden divide-y divide-gray-50">
-        {rows.map(row => <MobileCard key={row.id} row={row} lang={lang} />)}
+        {rows.map((row, idx) => <MobileCard key={`${row.id}-${row.seq}-${row.received_at || idx}`} row={row} lang={lang} />)}
       </div>
     </div>
   )

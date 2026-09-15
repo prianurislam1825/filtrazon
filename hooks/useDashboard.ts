@@ -160,7 +160,10 @@ export function useDashboard() {
 
       // Add to recent only if new seq
       if (json.isNewSeq) {
-        recentRef.current = [r, ...recentRef.current].slice(0, MAX_RECENT)
+        const withoutDuplicate = recentRef.current.filter(
+          existing => existing.seq !== r.seq && existing.id !== r.id,
+        )
+        recentRef.current = [r, ...withoutDuplicate].slice(0, MAX_RECENT)
         setRecentReadings([...recentRef.current])
         // Refresh chart on new data
         fetchChartData()

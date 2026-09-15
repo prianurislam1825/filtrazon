@@ -115,3 +115,31 @@ export async function writeFirebaseCmd(command: string): Promise<{ ok: boolean; 
     return { ok: false, error: err instanceof Error ? err.message : 'Unknown error' }
   }
 }
+
+/**
+ * Patch partial fields in Firebase device latest node (e.g. relay states).
+ */
+export async function patchFirebaseLatest(patch: Record<string, unknown>): Promise<{ ok: boolean; error?: string }> {
+  const url   = `${FIREBASE_BASE_URL}${FIREBASE_DEVICE_PATH}.json`
+  const token = process.env.FIREBASE_AUTH_TOKEN
+
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+  const fetchUrl = token ? `${url}?auth=${token}` : url
+
+  try {
+    const res = await fetch(fetchUrl, {
+      method:  'PATCH',
+      headers,
+      body:    JSON.stringify(patch),
+      signal:  AbortSignal.timeout(8000),
+    })
+    if (!res.ok) {
+      const body = await res.text().catch(() => '')
+      return { ok: false, error: `Firebase PATCH ${res.status}: ${body}` }
+    }
+    return { ok: true }
+  } catch (err) {
+    return { ok: false, error: err instanceof Error ? err.message : 'Unknown error' }
+  }
+}
+
