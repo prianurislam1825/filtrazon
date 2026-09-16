@@ -134,10 +134,11 @@ export default function AiRecommendationWidget() {
           {/* Backdrop for mobile */}
           <div
             onClick={() => setOpen(false)}
-            className="fixed inset-0 bg-black/40 backdrop-blur-xs sm:hidden pointer-events-auto"
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm sm:hidden pointer-events-auto"
+            style={{ zIndex: -1 }}
           />
 
-          <div className="pointer-events-auto w-full sm:w-[520px] max-h-[90vh] sm:max-h-[780px] bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl border border-gray-100 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-200">
+          <div className="relative pointer-events-auto w-full sm:w-[520px] max-h-[90vh] sm:max-h-[780px] bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl border border-gray-100 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-200">
             {/* Window Header */}
             <div className="px-4 py-3 bg-gradient-to-r from-[#1268A5] via-[#1A4F7C] to-[#15324A] text-white flex items-center justify-between shrink-0 shadow-sm">
               <div className="flex items-center gap-2.5">

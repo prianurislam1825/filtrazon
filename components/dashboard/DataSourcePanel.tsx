@@ -189,11 +189,6 @@ export default function DataSourcePanel({
             local={localReading ? localReading.total_liters.toFixed(1) : <span className="text-gray-300">—</span>}
           />
           <DataRow
-            label="Battery (%)"
-            firebase={firebaseReading.battery < 0 ? <span className="text-gray-400">N/A</span> : `${firebaseReading.battery}%`}
-            local={localReading ? (localReading.battery < 0 ? <span className="text-gray-400">N/A</span> : `${localReading.battery}%`) : <span className="text-gray-300">—</span>}
-          />
-          <DataRow
             label="RSSI (dBm)"
             firebase={firebaseReading.rssi}
             local={localReading ? localReading.rssi : <span className="text-gray-300">—</span>}

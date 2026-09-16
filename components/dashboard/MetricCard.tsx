@@ -80,39 +80,34 @@ export default function MetricCard({
         </span>
       </div>
 
-      {/* Center: large sensor icon + value side by side */}
-      <div className="flex items-center gap-3 mb-3">
-        {/* Icon — large, prominent, rounded square with shadow */}
-        <div
-          className="flex items-center justify-center rounded-2xl shrink-0"
-          style={{
-            width:      compact ? 48 : 56,
-            height:     compact ? 48 : 56,
-            background: s.bg,
-            color:      s.bar,
-            border:     `1.5px solid ${s.border}`,
-            boxShadow:  `0 2px 8px ${s.bar}25`,
-          }}
-        >
-          {/* Clone icon with larger size */}
-          <span style={{ display:'contents' }}>
-            {icon}
-          </span>
-        </div>
-
-        {/* Value */}
-        <div className="flex flex-col min-w-0">
-          <span
-            className="font-black tracking-tight leading-none"
+        {/* Center: large sensor icon + value side by side */}
+        <div className="flex items-center gap-2.5 sm:gap-3 mb-3">
+          {/* Icon — responsive size, prominent, rounded square with shadow */}
+          <div
+            className={`flex items-center justify-center rounded-2xl shrink-0 ${compact ? 'w-10 h-10 sm:w-12 sm:h-12' : 'w-12 h-12 sm:w-14 sm:h-14'}`}
             style={{
-              color:    s.text,
-              fontSize: compact ? '1.6rem' : '2rem',
+              background: s.bg,
+              color:      s.bar,
+              border:     `1.5px solid ${s.border}`,
+              boxShadow:  `0 2px 8px ${s.bar}25`,
             }}
           >
-            {typeof value === 'number'
-              ? value.toLocaleString('id-ID', { maximumFractionDigits: 2 })
-              : value}
-          </span>
+            {/* Clone icon with larger size */}
+            <span style={{ display:'contents' }}>
+              {icon}
+            </span>
+          </div>
+  
+          {/* Value */}
+          <div className="flex flex-col min-w-0">
+            <span
+              className={`font-black tracking-tight leading-none truncate ${compact ? 'text-xl sm:text-2xl' : 'text-2xl sm:text-[1.8rem] lg:text-3xl'}`}
+              style={{ color: s.text }}
+            >
+              {typeof value === 'number'
+                ? value.toLocaleString('id-ID', { maximumFractionDigits: 2 })
+                : value}
+            </span>
           {unit && (
             <span className="text-xs text-gray-400 font-medium mt-0.5">{unit}</span>
           )}

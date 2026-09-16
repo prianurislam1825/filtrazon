@@ -184,9 +184,6 @@ export default function KontrolPage() {
               <div><span className="text-gray-400">pH: </span><strong>{fbReading.ph.toFixed(2)}</strong></div>
               <div><span className="text-gray-400">Flow: </span><strong>{fbReading.flow_lpm.toFixed(2)} L/min</strong></div>
               <div><span className="text-gray-400">RSSI: </span><strong>{fbReading.rssi} dBm</strong></div>
-              <div><span className="text-gray-400">Battery: </span>
-                <strong>{fbReading.battery < 0 ? 'N/A' : `${fbReading.battery}%`}</strong>
-              </div>
             </div>
           </div>
         )}

@@ -198,17 +198,6 @@ export default function PerangkatPage() {
 
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 mb-4">
                     <InfoRow label={T.uptime[lang]}  value={fmtUptime(node.uptime_ms)} />
-                    <InfoRow
-                      label={T.battery[lang]}
-                      value={
-                        node.battery && node.battery > 0
-                          ? <span className="flex items-center gap-1">
-                              <Battery size={13} />{node.battery}%
-                            </span>
-                          : 'N/A'
-                      }
-                      color={batResult ? statusColor(batResult.status) : undefined}
-                    />
                     <InfoRow label={T.lastSeq[lang]}  value={node.last_seq ? `#${node.last_seq}` : '—'} />
                     <InfoRow label={T.lastSeen[lang]}  value={fmtAgo(node.last_seen)} />
                     <InfoRow label={T.firmware[lang]}  value={node.firmware ?? '—'} />
