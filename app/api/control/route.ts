@@ -125,10 +125,11 @@ export async function POST(request: NextRequest): Promise<Response> {
         results.push({ command: cmd, ok: false, error: 'Invalid command' })
         continue
       }
-      // Force change pulse on Firebase RTDB so Gateway triggers event reliably
-      await writeFirebaseCmd('')
-      await sleep(80)
-      const result = await writeFirebaseCmd(cmd)
+      // Alternate target prefix to bypass Gateway's lastCmd cache
+      const prefix = Math.random() > 0.5 ? '*:' : 'FILTRAZON-01:'
+      const finalCommand = cmd.includes(':') ? cmd : `${prefix}${cmd}`
+      
+      const result = await writeFirebaseCmd(finalCommand)
       if (result.ok) {
         await applyRelayPatch(cmd)
       }
@@ -154,13 +155,12 @@ export async function POST(request: NextRequest): Promise<Response> {
     )
   }
 
-  // Force Firebase RTDB value event trigger:
-  // If the same command (e.g. R1OFF) was already in Firebase /cmd, Firebase may not
-  // dispatch a change event to the Gateway. Clearing it briefly guarantees a fresh event.
-  await writeFirebaseCmd('')
-  await sleep(100)
+  // Alternate target prefix to bypass Gateway's lastCmd cache (cmd != lastCmd)
+  // The Node accepts both "*" (broadcast) and "FILTRAZON-01" as valid targets.
+  const prefix = Math.random() > 0.5 ? '*:' : 'FILTRAZON-01:'
+  const finalCommand = command.includes(':') ? command : `${prefix}${command}`
 
-  const result = await writeFirebaseCmd(command)
+  const result = await writeFirebaseCmd(finalCommand)
   if (!result.ok) {
     return Response.json({ ok: false, error: result.error ?? 'Firebase write failed' }, { status: 502 })
   }
