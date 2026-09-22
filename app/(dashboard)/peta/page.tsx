@@ -124,6 +124,7 @@ const DUMMY_NODES: NodeLocation[] = [
 ]
 
 export default function PetaPage() {
+  const { latestReading } = useDashboard()
   const [nodes, setNodes] = useState<NodeLocation[]>(DUMMY_NODES)
   const [selectedId, setSelectedId] = useState<string>(DUMMY_NODES[0].id)
   const [filter, setFilter] = useState<'all' | 'active' | 'standby' | 'warning'>('all')
@@ -135,6 +136,57 @@ export default function PetaPage() {
     if (filter === 'all') return true
     return n.status === filter
   })
+
+  // Update node 1 with Firebase data if available
+  useEffect(() => {
+    // 1. First, apply any sensor data from the local SSE/Cloud (latestReading)
+    if (latestReading) {
+      setNodes(prev => {
+        const newNodes = [...prev]
+        const n1 = newNodes.find(n => n.id === 'FILTRAZON-01')
+        if (n1) {
+          if (latestReading.lat) n1.lat = latestReading.lat
+          if (latestReading.lon) n1.lon = latestReading.lon
+          n1.ph = latestReading.ph
+          n1.turbidity = latestReading.turbidity
+          n1.rssi = latestReading.rssi
+          n1.battery = latestReading.battery > 0 ? latestReading.battery : n1.battery
+          n1.status = latestReading.pump_status ? 'active' : 'standby'
+          n1.statusLabel = latestReading.pump_status ? 'Aktif Menyaring' : 'Standby'
+          n1.lastFix = 'Baru saja (Live Sensor)'
+        }
+        return newNodes
+      })
+    }
+
+    // 2. Override GPS specifically from Firebase (because Local Mode doesn't get GPS from Arduino)
+    const fetchGps = async () => {
+      try {
+        const res = await fetch('https://filtrazon-e4ab3-default-rtdb.asia-southeast1.firebasedatabase.app/filtrazon/devices/FILTRAZON-01/gps/latest.json?ts=' + Date.now())
+        if (res.ok) {
+          const gpsData = await res.json()
+          if (gpsData && typeof gpsData.latitude === 'number') {
+            setNodes(prev => {
+              const newNodes = [...prev]
+              const n1 = newNodes.find(n => n.id === 'FILTRAZON-01')
+              if (n1) {
+                n1.lat = gpsData.latitude
+                n1.lon = gpsData.longitude
+                n1.lastFix = `Baru saja (GPS 3D Fix - ${gpsData.satellites} Sats)`
+              }
+              return newNodes
+            })
+          }
+        }
+      } catch (err) {
+        // ignore fetch error
+      }
+    }
+
+    fetchGps()
+    const interval = setInterval(fetchGps, 15000) // Poll GPS every 15s
+    return () => clearInterval(interval)
+  }, [latestReading])
 
   // Simulasi refresh GPS
   function handleSimulateGpsUpdate() {
