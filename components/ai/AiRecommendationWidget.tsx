@@ -28,6 +28,7 @@ const QUICK_PROMPTS: QuickPromptItem[] = [
 export default function AiRecommendationWidget() {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [lastQuestion, setLastQuestion] = useState<string | null>(null)
   const [recommendation, setRecommendation] = useState<string | null>(null)
   const [model, setModel] = useState<string>('FILTRAZON Research Engine')
   const [quotaNotice, setQuotaNotice] = useState<string | null>(null)
@@ -43,6 +44,7 @@ export default function AiRecommendationWidget() {
   // Fetch AI recommendation
   async function fetchRecommendation(customPrompt?: string) {
     setLoading(true)
+    setLastQuestion(customPrompt || null)
     try {
       const res = await fetch('/api/ai-recommendation', {
         method: 'POST',
@@ -272,8 +274,16 @@ export default function AiRecommendationWidget() {
 
             {/* Output Scroll Area */}
             <div ref={chatScrollRef} className="flex-1 p-4 overflow-y-auto space-y-3 bg-[#FCFDFE] text-xs text-gray-700 leading-relaxed min-h-[260px]">
+              {lastQuestion && (
+                <div className="flex flex-col items-end mb-4 border-b border-gray-100 pb-4">
+                  <span className="text-[9px] text-gray-400 mb-1 font-semibold pr-1">Anda</span>
+                  <div className="bg-sky-50 border border-sky-100 text-[#15324A] px-3 py-2 rounded-2xl rounded-tr-sm text-xs max-w-[85%] shadow-sm">
+                    {lastQuestion}
+                  </div>
+                </div>
+              )}
               {loading ? (
-                <div className="h-full flex flex-col items-center justify-center py-12 text-center text-gray-400 space-y-3">
+                <div className="flex flex-col items-center justify-center py-8 text-center text-gray-400 space-y-3">
                   <div className="w-10 h-10 rounded-2xl bg-sky-50 border border-sky-100 flex items-center justify-center text-[#1268A5] animate-pulse shadow-sm">
                     <Sparkles size={20} className="animate-spin" style={{ animationDuration: '3s' }} />
                   </div>
@@ -296,8 +306,15 @@ export default function AiRecommendationWidget() {
                       {copied ? 'Tersalin' : 'Salin Laporan'}
                     </button>
                   </div>
-                  <div className="prose prose-xs max-w-none prose-headings:font-bold prose-headings:text-[#15324A] prose-strong:text-gray-900 prose-table:my-2 prose-th:bg-gray-50 prose-th:px-2 prose-th:py-1 prose-td:px-2 prose-td:py-1 prose-td:border prose-th:border whitespace-pre-line leading-relaxed">
-                    {recommendation}
+                  <div className="flex flex-col items-start mt-2">
+                    <span className="text-[9px] text-gray-400 mb-1 font-semibold pl-1 flex items-center gap-1">
+                      <Bot size={10} className="text-sky-500" /> FILTRAZON AI
+                    </span>
+                    <div className="bg-white border border-gray-200 text-gray-700 px-4 py-3 rounded-2xl rounded-tl-sm text-xs w-full shadow-sm">
+                      <div className="prose prose-xs max-w-none prose-headings:font-bold prose-headings:text-[#15324A] prose-strong:text-gray-900 prose-table:my-2 prose-th:bg-gray-50 prose-th:px-2 prose-th:py-1 prose-td:px-2 prose-td:py-1 prose-td:border prose-th:border whitespace-pre-line leading-relaxed">
+                        {recommendation}
+                      </div>
+                    </div>
                   </div>
                 </div>
               ) : (
