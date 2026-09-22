@@ -60,6 +60,8 @@ CREATE TABLE IF NOT EXISTS readings (
   tds           FLOAT           NOT NULL,
   turbidity     FLOAT           NOT NULL,
   flow_lpm      FLOAT           NOT NULL,
+  lat           FLOAT           NULL,
+  lon           FLOAT           NULL,
   total_liters  FLOAT           NOT NULL,
   pump_status   TINYINT(1)      NOT NULL DEFAULT 0,
   uv_status     TINYINT(1)      NOT NULL DEFAULT 0,

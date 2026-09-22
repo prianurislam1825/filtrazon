@@ -184,7 +184,7 @@ export default function PetaPage() {
     }
 
     fetchGps()
-    const interval = setInterval(fetchGps, 15000) // Poll GPS every 15s
+    const interval = setInterval(fetchGps, 600000) // Poll GPS every 10m
     return () => clearInterval(interval)
   }, [latestReading])
 

@@ -13,8 +13,8 @@ export async function insertReading(
     `INSERT INTO readings
       (device_id, seq, uptime_ms, ph, tds, turbidity, flow_lpm,
        total_liters, pump_status, uv_status, relay1, relay2, relay3,
-       relay4, flags, battery, rssi, snr, gateway_id, received_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+       relay4, flags, battery, rssi, snr, gateway_id, received_at, lat, lon)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
      ON DUPLICATE KEY UPDATE id=id`,
     [
       r.device_id ?? 'FILTRAZON-01',
@@ -37,6 +37,8 @@ export async function insertReading(
       r.snr         ?? 0,
       r.gateway_id  ?? (r as { gateway?: string }).gateway ?? 'GW-01',
       (r.received_at ? new Date(r.received_at) : new Date()).toISOString().slice(0, 19).replace('T', ' '),
+      r.lat         ?? null,
+      r.lon         ?? null,
     ],
   )
   return result.insertId
