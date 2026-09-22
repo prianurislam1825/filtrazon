@@ -27,7 +27,6 @@ const QUICK_PROMPTS: QuickPromptItem[] = [
 
 export default function AiRecommendationWidget() {
   const [open, setOpen] = useState(false)
-  const [hidden, setHidden] = useState(false)
   const [loading, setLoading] = useState(false)
   const [recommendation, setRecommendation] = useState<string | null>(null)
   const [model, setModel] = useState<string>('FILTRAZON Research Engine')
@@ -36,7 +35,10 @@ export default function AiRecommendationWidget() {
   const [copied, setCopied] = useState(false)
   const [telemetry, setTelemetry] = useState<Record<string, unknown> | null>(null)
   const [selectedCategory, setSelectedCategory] = useState<string>('Semua')
+  const [hidden, setHidden] = useState(false)
   const chatScrollRef = useRef<HTMLDivElement>(null)
+  const fabRef = useRef<HTMLDivElement>(null)
+  const windowRef = useRef<HTMLDivElement>(null)
 
   if (hidden) return null
 
@@ -111,13 +113,13 @@ export default function AiRecommendationWidget() {
   return (
     <>
       {/* ── Floating Trigger Button ── */}
-      <Draggable bounds="parent">
-        <div className="fixed bottom-20 lg:bottom-6 right-4 sm:right-6 z-40 cursor-move">
+      <Draggable nodeRef={fabRef}>
+        <div ref={fabRef} className="fixed bottom-20 lg:bottom-6 right-4 sm:right-6 z-40 cursor-move">
           <div className="relative group">
             {/* Close / Hide Button */}
             <button
               onClick={(e) => { e.stopPropagation(); setHidden(true); }}
-              className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10 shadow-md hover:bg-red-600"
+              className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center transition-opacity z-50 shadow-md hover:bg-red-600"
               title="Sembunyikan AI"
             >
               <X size={12} />
@@ -146,7 +148,7 @@ export default function AiRecommendationWidget() {
 
       {/* ── AI Recommendation Widget Window ── */}
       {open && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-6 pointer-events-none">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-end sm:p-6 pointer-events-none">
           {/* Backdrop for mobile */}
           <div
             onClick={() => setOpen(false)}
@@ -154,8 +156,8 @@ export default function AiRecommendationWidget() {
             style={{ zIndex: -1 }}
           />
 
-          <Draggable handle=".ai-handle" bounds="parent">
-            <div className="relative pointer-events-auto w-full sm:w-[520px] max-h-[90vh] sm:max-h-[780px] bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl border border-gray-100 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-200">
+          <Draggable handle=".ai-handle" nodeRef={windowRef}>
+            <div ref={windowRef} className="relative pointer-events-auto w-full sm:w-[520px] max-h-[90vh] sm:max-h-[780px] bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl border border-gray-100 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-200">
               {/* Window Header */}
               <div className="ai-handle cursor-move px-4 py-3 bg-gradient-to-r from-[#1268A5] via-[#1A4F7C] to-[#15324A] text-white flex items-center justify-between shrink-0 shadow-sm">
               <div className="flex items-center gap-2.5">
@@ -320,7 +322,7 @@ export default function AiRecommendationWidget() {
                 </button>
               </div>
             </form>
-          </div>
+            </div>
           </Draggable>
         </div>
       )}
