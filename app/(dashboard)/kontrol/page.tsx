@@ -6,6 +6,7 @@ import RelayControl from '@/components/dashboard/RelayControl'
 import ConnectionBadge from '@/components/ui/ConnectionBadge'
 import { evaluateConnectionStatus } from '@/lib/thresholds'
 import { RefreshCw, Zap } from 'lucide-react'
+import { useLang } from '@/lib/i18n/context'
 import type { FirebaseReading, ConnectionStatus } from '@/types'
 
 const POLL_MS = 5000
@@ -19,6 +20,13 @@ function formatAgo(iso: string | null): string {
 }
 
 export default function KontrolPage() {
+  const { lang } = useLang()
+  const t = {
+    title: lang === 'id' ? 'Kontrol Relay' : 'Relay Control',
+    subtitle: lang === 'id' ? 'Command dikirim ke Firebase → Gateway → LoRa → Node' : 'Commands are sent to Firebase → Gateway → LoRa → Node',
+    updated: lang === 'id' ? 'Firebase diperbarui' : 'Firebase updated',
+  }
+
   const [fbReading,   setFbReading]   = useState<FirebaseReading | null>(null)
   const [connStatus,  setConnStatus]  = useState<ConnectionStatus>('connecting')
   const [lastUpdate,  setLastUpdate]  = useState<string | null>(null)
@@ -116,12 +124,12 @@ export default function KontrolPage() {
         {/* Header */}
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <div>
-            <h1 className="text-lg font-bold text-[#15324A] flex items-center gap-2">
-              <Zap size={18} className="text-[#1268A5]" />
-              Kontrol Relay
+            <h1 className="text-xl sm:text-2xl font-black text-[#15324A] uppercase tracking-tight flex items-center gap-2">
+              <Zap size={22} className="text-[#5BBCEB]" />
+              {t.title}
             </h1>
             <p className="text-xs text-gray-400 mt-0.5">
-              Command dikirim ke Firebase /filtrazon/cmd → Gateway → LoRa → Node
+              {t.subtitle}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -140,8 +148,8 @@ export default function KontrolPage() {
         {lastUpdate && (
           <div className="flex items-center gap-1.5 text-[10px] text-gray-400">
             <span className={`w-1.5 h-1.5 rounded-full ${connStatus === 'live' ? 'bg-green-500 animate-pulse' : 'bg-gray-400'}`} />
-            Firebase diperbarui {formatAgo(lastUpdate)}
-            {fbReading && <span className="ml-1">· seq #{fbReading.seq}</span>}
+            {t.updated} {formatAgo(lastUpdate)}
+            {fbReading && <span className="ml-1">• seq #{fbReading.seq}</span>}
           </div>
         )}
 
