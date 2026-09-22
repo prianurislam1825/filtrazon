@@ -46,6 +46,17 @@ function ColorValue({ value, metric, pumpOn = true }: {
   return <span className="font-semibold" style={{ color }}>{value}</span>
 }
 
+function timeAgo(iso: string, lang: 'id' | 'en') {
+  const seconds = Math.floor((new Date().getTime() - new Date(iso).getTime()) / 1000)
+  if (seconds < 60) return lang === 'id' ? "Baru saja" : "Just now"
+  const minutes = Math.floor(seconds / 60)
+  if (minutes < 60) return lang === 'id' ? `${minutes} mnt lalu` : `${minutes}m ago`
+  const hours = Math.floor(minutes / 60)
+  if (hours < 24) return lang === 'id' ? `${hours} jam lalu` : `${hours}h ago`
+  const days = Math.floor(hours / 24)
+  return lang === 'id' ? `${days} hr lalu` : `${days}d ago`
+}
+
 function formatDateTime(iso: string) {
   return new Date(iso).toLocaleString('id-ID', {
     day: '2-digit', month: '2-digit', year: 'numeric',
@@ -63,7 +74,10 @@ function DesktopRow({ row, lang }: { row: TelemetryRow; lang: 'id' | 'en' }) {
 
   return (
     <tr className={`border-b border-gray-50 transition-colors ${rowBg}`}>
-      <td className="px-4 py-2.5 text-xs font-mono text-gray-600 whitespace-nowrap">{formatDateTime(row.received_at)}</td>
+      <td className="px-4 py-2.5 whitespace-nowrap">
+        <div className="text-xs font-bold text-gray-700">{timeAgo(row.received_at, lang)}</div>
+        <div className="text-[9px] font-mono text-gray-400 mt-0.5">{formatDateTime(row.received_at)}</div>
+      </td>
       <td className="px-4 py-2.5 text-xs text-gray-500">#{row.seq}</td>
       <td className="px-4 py-2.5 text-xs"><ColorValue value={row.ph} metric="ph" /></td>
       <td className="px-4 py-2.5 text-xs"><ColorValue value={row.tds} metric="tds" /></td>
@@ -102,7 +116,10 @@ function MobileCard({ row, lang }: { row: TelemetryRow; lang: 'id' | 'en' }) {
     <div className={`p-3 border-b border-gray-50 last:border-0 ${cardBorder}`}>
       {/* Header */}
       <div className="flex items-center justify-between mb-2">
-        <span className="text-[11px] font-mono text-gray-500">{formatDateTime(row.received_at)}</span>
+        <div className="flex flex-col">
+          <span className="text-xs font-bold text-gray-700">{timeAgo(row.received_at, lang)}</span>
+          <span className="text-[9px] font-mono text-gray-400 mt-0.5">{formatDateTime(row.received_at)}</span>
+        </div>
         <StatusDot status={row.status} lang={lang} />
       </div>
       {/* Sensor grid */}
@@ -189,8 +206,8 @@ export default function RiwayatPage() {
   const [deviceId,    setDeviceId]    = useState('FILTRAZON-01')
   const [exporting,   setExporting]   = useState(false)
 
-  const fetchData = useCallback(async (pg = 0) => {
-    setLoading(true); setError(false)
+  const fetchData = useCallback(async (pg = 0, silent = false) => {
+    if (!silent) { setLoading(true); setError(false) }
     try {
       const p = new URLSearchParams({ limit: String(PAGE_SIZE), offset: String(pg * PAGE_SIZE) })
       if (fromDate) p.set('from', fromDate)
@@ -201,11 +218,21 @@ export default function RiwayatPage() {
       if (!json.ok) throw new Error()
       setRows(json.data)
       setHasMore(json.data.length === PAGE_SIZE)
-    } catch { setError(true) }
-    finally  { setLoading(false) }
+    } catch { if (!silent) setError(true) }
+    finally  { if (!silent) setLoading(false) }
   }, [fromDate, toDate, deviceId])
 
   useEffect(() => { fetchData(0); setPage(0) }, [fetchData])
+
+  // Real-time polling
+  useEffect(() => {
+    const timer = setInterval(() => {
+      if (page === 0 && !fromDate && !toDate) {
+        fetchData(0, true)
+      }
+    }, 10000)
+    return () => clearInterval(timer)
+  }, [page, fromDate, toDate, fetchData])
 
   async function handleExport() {
     setExporting(true)
@@ -253,7 +280,13 @@ export default function RiwayatPage() {
         {/* Header */}
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <div>
-            <h1 className="text-lg font-bold text-[#15324A]">{T.title[lang]}</h1>
+            <h1 className="text-lg font-bold text-[#15324A] flex items-center gap-2">
+              {T.title[lang]}
+              <span className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-red-50 text-red-600 border border-red-100 text-[8px] font-black tracking-wider uppercase">
+                <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                LIVE
+              </span>
+            </h1>
             <p className="text-xs text-gray-400 mt-0.5">{T.subtitle[lang]}</p>
           </div>
           <div className="flex items-center gap-2">
