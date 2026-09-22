@@ -12,6 +12,9 @@ export const FIREBASE_DEVICE_PATH =
   process.env.FIREBASE_DEVICE_PATH ??
   '/filtrazon/devices/FILTRAZON-01/latest'
 
+export const FIREBASE_GPS_PATH =
+  '/filtrazon/devices/FILTRAZON-01/gps/latest'
+
 // Raw shape as stored in Firebase (pump_status / uv_status are strings)
 export interface FirebaseRawReading {
   device_id:   string
@@ -51,13 +54,14 @@ export interface FirebaseFetchResult {
  */
 export async function fetchFirebaseLatest(): Promise<FirebaseFetchResult> {
   const url = `${FIREBASE_BASE_URL}${FIREBASE_DEVICE_PATH}.json`
+  const gpsUrl = `${FIREBASE_BASE_URL}${FIREBASE_GPS_PATH}.json`
   const fetchedAt = new Date().toISOString()
 
   try {
-    const res = await fetch(url, {
-      next: { revalidate: 0 },   // always fresh, no Next.js cache
-      signal: AbortSignal.timeout(8000),
-    })
+    const [res, gpsRes] = await Promise.all([
+      fetch(url, { next: { revalidate: 0 }, signal: AbortSignal.timeout(8000) }),
+      fetch(gpsUrl, { next: { revalidate: 0 }, signal: AbortSignal.timeout(8000) }).catch(() => null)
+    ])
 
     if (!res.ok) {
       return { ok: false, data: null, fetchedAt, error: `HTTP ${res.status}` }
@@ -67,6 +71,15 @@ export async function fetchFirebaseLatest(): Promise<FirebaseFetchResult> {
 
     if (!raw || typeof raw !== 'object') {
       return { ok: false, data: null, fetchedAt, error: 'Empty or null data' }
+    }
+
+    // Try to merge GPS data if available
+    if (gpsRes && gpsRes.ok) {
+      const gpsData = await gpsRes.json().catch(() => null)
+      if (gpsData && typeof gpsData === 'object') {
+        if (typeof gpsData.latitude === 'number') raw.lat = gpsData.latitude
+        if (typeof gpsData.longitude === 'number') raw.lon = gpsData.longitude
+      }
     }
 
     return { ok: true, data: raw, fetchedAt }
