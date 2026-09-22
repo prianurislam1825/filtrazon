@@ -11,6 +11,8 @@ export interface NodePayload {
   tds: number
   turbidity: number
   flow_lpm: number
+    lat?: number
+    lon?: number
   total_liters: number
   pump_status: boolean
   uv_status: boolean
@@ -229,6 +231,8 @@ export interface FirebaseReading {
   rssi:         number
   snr:          number
   rx_ms:        number
+    lat?:         number
+    lon?:         number
   fetched_at:   string   // ISO — when backend fetched from Firebase
 }
 
@@ -281,6 +285,8 @@ export interface TelemetryRow {
   tds: number
   turbidity: number
   flow_lpm: number
+    lat?: number
+    lon?: number
   total_liters: number
   rssi: number
   snr: number

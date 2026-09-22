@@ -1,12 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import AppShell from '@/components/layout/AppShell'
 import {
   MapPin, Satellite, Clock, Radio, Navigation, Compass,
   BatteryCharging, Sun, Droplets, Activity, CheckCircle2,
   AlertTriangle, ExternalLink, RefreshCw, Eye, ShieldCheck
 } from 'lucide-react'
+import { useDashboard } from '@/hooks/useDashboard'
 
 interface NodeLocation {
   id: string

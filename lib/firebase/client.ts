@@ -34,6 +34,8 @@ export interface FirebaseRawReading {
   rssi:        number
   snr:         number
   rx_ms:       number
+  lat?:        number
+  lon?:        number
 }
 
 export interface FirebaseFetchResult {
