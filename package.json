@@ -17,6 +17,7 @@
     "next-auth": "5.0.0-beta.32",
     "react": "19.2.8",
     "react-dom": "19.2.8",
+    "react-draggable": "^4.7.2",
     "recharts": "^2.15.3"
   },
   "devDependencies": {

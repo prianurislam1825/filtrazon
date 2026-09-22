@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import Draggable from 'react-draggable'
 import {
   Sparkles, X, Send, Bot, RefreshCw, AlertTriangle,
   CheckCircle2, Droplets, Gauge, Waves, Activity,
@@ -26,6 +27,7 @@ const QUICK_PROMPTS: QuickPromptItem[] = [
 
 export default function AiRecommendationWidget() {
   const [open, setOpen] = useState(false)
+  const [hidden, setHidden] = useState(false)
   const [loading, setLoading] = useState(false)
   const [recommendation, setRecommendation] = useState<string | null>(null)
   const [model, setModel] = useState<string>('FILTRAZON Research Engine')
@@ -35,6 +37,8 @@ export default function AiRecommendationWidget() {
   const [telemetry, setTelemetry] = useState<Record<string, unknown> | null>(null)
   const [selectedCategory, setSelectedCategory] = useState<string>('Semua')
   const chatScrollRef = useRef<HTMLDivElement>(null)
+
+  if (hidden) return null
 
   // Fetch AI recommendation
   async function fetchRecommendation(customPrompt?: string) {
@@ -107,30 +111,42 @@ export default function AiRecommendationWidget() {
   return (
     <>
       {/* ── Floating Trigger Button ── */}
-      <div className="fixed bottom-20 lg:bottom-6 right-4 sm:right-6 z-40">
-        <button
-          onClick={() => setOpen(prev => !prev)}
-          aria-label="Buka AI Advisor"
-          className="group relative flex items-center gap-2.5 px-4 py-3 rounded-full bg-gradient-to-r from-[#1268A5] via-[#2185D0] to-[#5BBCEB] text-white shadow-xl shadow-sky-500/25 hover:shadow-2xl hover:shadow-sky-500/40 hover:scale-105 active:scale-95 transition-all duration-200 border border-white/20"
-        >
-          {/* Glowing pulse ring */}
-          <span className="absolute -inset-0.5 rounded-full bg-gradient-to-r from-sky-400 to-indigo-500 opacity-75 blur-sm group-hover:opacity-100 animate-pulse -z-10" />
+      <Draggable bounds="parent">
+        <div className="fixed bottom-20 lg:bottom-6 right-4 sm:right-6 z-40 cursor-move">
+          <div className="relative group">
+            {/* Close / Hide Button */}
+            <button
+              onClick={(e) => { e.stopPropagation(); setHidden(true); }}
+              className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10 shadow-md hover:bg-red-600"
+              title="Sembunyikan AI"
+            >
+              <X size={12} />
+            </button>
+            <button
+              onClick={() => setOpen(prev => !prev)}
+              aria-label="Buka AI Advisor"
+              className="relative flex items-center gap-2.5 px-4 py-3 rounded-full bg-gradient-to-r from-[#1268A5] via-[#2185D0] to-[#5BBCEB] text-white shadow-xl shadow-sky-500/25 hover:shadow-2xl hover:shadow-sky-500/40 hover:scale-105 active:scale-95 transition-all duration-200 border border-white/20 pointer-events-auto"
+            >
+              {/* Glowing pulse ring */}
+              <span className="absolute -inset-0.5 rounded-full bg-gradient-to-r from-sky-400 to-indigo-500 opacity-75 blur-sm group-hover:opacity-100 animate-pulse -z-10 pointer-events-none" />
 
-          <div className="w-6 h-6 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-            <Sparkles size={14} className="text-yellow-200 animate-spin" style={{ animationDuration: '4s' }} />
+              <div className="w-6 h-6 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center pointer-events-none">
+                <Sparkles size={14} className="text-yellow-200 animate-spin" style={{ animationDuration: '4s' }} />
+              </div>
+              <span className="text-xs font-bold tracking-wide flex items-center gap-1.5 pointer-events-none">
+                AI Water Advisor
+                <span className="px-1.5 py-0.5 text-[9px] font-black uppercase rounded-full bg-white/20 text-white border border-white/30">
+                  Research
+                </span>
+              </span>
+            </button>
           </div>
-          <span className="text-xs font-bold tracking-wide flex items-center gap-1.5">
-            AI Water Advisor
-            <span className="px-1.5 py-0.5 text-[9px] font-black uppercase rounded-full bg-white/20 text-white border border-white/30">
-              Research
-            </span>
-          </span>
-        </button>
-      </div>
+        </div>
+      </Draggable>
 
       {/* ── AI Recommendation Widget Window ── */}
       {open && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-end sm:p-6 pointer-events-none">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-6 pointer-events-none">
           {/* Backdrop for mobile */}
           <div
             onClick={() => setOpen(false)}
@@ -138,9 +154,10 @@ export default function AiRecommendationWidget() {
             style={{ zIndex: -1 }}
           />
 
-          <div className="relative pointer-events-auto w-full sm:w-[520px] max-h-[90vh] sm:max-h-[780px] bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl border border-gray-100 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-200">
-            {/* Window Header */}
-            <div className="px-4 py-3 bg-gradient-to-r from-[#1268A5] via-[#1A4F7C] to-[#15324A] text-white flex items-center justify-between shrink-0 shadow-sm">
+          <Draggable handle=".ai-handle" bounds="parent">
+            <div className="relative pointer-events-auto w-full sm:w-[520px] max-h-[90vh] sm:max-h-[780px] bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl border border-gray-100 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-200">
+              {/* Window Header */}
+              <div className="ai-handle cursor-move px-4 py-3 bg-gradient-to-r from-[#1268A5] via-[#1A4F7C] to-[#15324A] text-white flex items-center justify-between shrink-0 shadow-sm">
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-xl bg-white/15 flex items-center justify-center border border-white/20 shadow-xs">
                   <Bot size={18} className="text-sky-300" />
@@ -304,6 +321,7 @@ export default function AiRecommendationWidget() {
               </div>
             </form>
           </div>
+          </Draggable>
         </div>
       )}
     </>
