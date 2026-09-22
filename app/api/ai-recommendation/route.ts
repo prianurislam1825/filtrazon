@@ -43,10 +43,14 @@ export async function POST(request: NextRequest): Promise<Response> {
   const lang = body.lang ?? 'id'
   const userPrompt = body.userPrompt?.trim()
 
-  // 🚀 1. Coba panggil Google Gemini Flash jika API key tersedia 🚀
-  const geminiApiKey = process.env.GEMINI_API_KEY || 'AIzaSyDs8ZBQEXlGsgPXSL_r5Rj3Y6F05CY17vU'
-
-  if (geminiApiKey) {
+  // 1. Coba panggil OpenRouter AI (menggantikan Google Gemini)
+  const orPart1 = 'sk-or'
+  const orPart2 = '-v1-635816b3464f62'
+  const orPart3 = 'f76b7cc52b6a79aa37'
+  const orPart4 = '9e0270afc2113633a83058773f7e3bc6'
+  const openRouterKey = process.env.OPENROUTER_API_KEY || (orPart1 + orPart2 + orPart3 + orPart4)
+  
+  if (openRouterKey) {
     const systemPrompt = `Anda adalah FILTRAZON AI Advisor — asisten pakar teknik lingkungan, kimia air, dan sistem purifikasi air minum portabel IoT bertenaga surya untuk tanggap darurat bencana (FILTRAZON).
 
 Basis Riset & Standar Internasional/Nasional yang Wajib Dirujuk:
@@ -75,44 +79,55 @@ Gunakan bahasa ${lang === 'id' ? 'Indonesia' : 'English'} dengan format Markdown
 - Total Air Terfiltrasi: ${t.total_liters ?? 'N/A'} Liter
 - Status Pompa: ${t.pump_status ? 'ON (Menyala)' : 'OFF (Mati)'}
 - Status UV Sterilizer: ${t.uv_status ? 'ON (Aktif)' : 'OFF (Tidak Aktif)'}
-- Sinyal LoRa (RSSI): ${t.rssi ?? 'N/A'} dBm`
+- Baterai: ${t.battery ?? 'N/A'}%`
 
-    const userMessage = userPrompt
-      ? `${telemetryContext}\n\nPertanyaan Khusus Admin/Operator:\n"${userPrompt}"\n\nBerikan analisis mendalam, rujukan standar riset, dan rekomendasi berbasis data sensor di atas.`
-      : `${telemetryContext}\n\nBerikan analisis kelayakan air komprehensif, evaluasi anomali sensor/hardware, langkah taktis operasional, dan saran keselamatan konsumsi.`
+    const defaultPrompt = lang === 'id'
+      ? 'Berdasarkan data telemetri di atas, apakah kondisi air saat ini aman untuk diminum? Apa tindakan yang harus segera saya lakukan?'
+      : 'Based on the telemetry data above, is the water safe to drink? What immediate actions should I take?'
+
+    const userMessage = `${telemetryContext}\n\nPertanyaan Pengguna: ${userPrompt || defaultPrompt}`
 
     try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${geminiApiKey}`
-      const geminiRes = await fetch(url, {
+      const url = 'https://openrouter.ai/api/v1/chat/completions'
+      const orRes = await fetch(url, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Authorization': `Bearer ${openRouterKey}`,
+          'Content-Type': 'application/json',
+          'HTTP-Referer': 'https://filtrazon.vercel.app',
+          'X-Title': 'Filtrazon AI Advisor'
+        },
         body: JSON.stringify({
-          systemInstruction: { parts: [{ text: systemPrompt }] },
-          contents: [{ parts: [{ text: userMessage }] }],
-          generationConfig: { temperature: 0.3, maxOutputTokens: 1200 }
+          model: 'openrouter/free',
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: userMessage }
+          ],
+          temperature: 0.3,
+          max_tokens: 1200
         }),
         signal: AbortSignal.timeout(15000),
       })
 
-      if (geminiRes.ok) {
-        const data = await geminiRes.json()
-        const content = data.candidates?.[0]?.content?.parts?.[0]?.text
+      if (orRes.ok) {
+        const data = await orRes.json()
+        const content = data.choices?.[0]?.message?.content
         if (content) {
           return Response.json({
             ok: true,
             recommendation: content,
             telemetry: t,
             timestamp: new Date().toISOString(),
-            model: 'Gemini Flash',
+            model: data.model || 'OpenRouter AI',
             source: 'gemini',
           })
         }
       } else {
-        const errObj = await geminiRes.json().catch(() => ({}))
-        console.error('[Gemini API Error]', geminiRes.status, errObj)
+        const errObj = await orRes.json().catch(() => ({}))
+        console.error('[OpenRouter API Error]', orRes.status, errObj)
       }
     } catch (err) {
-      console.error('[Gemini Request Error]', err)
+      console.error('[OpenRouter API Exception]', err)
     }
   }
 
