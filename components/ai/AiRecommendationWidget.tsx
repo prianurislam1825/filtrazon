@@ -107,7 +107,19 @@ export default function AiRecommendationWidget() {
   const filteredPrompts = selectedCategory === 'Semua'
     ? QUICK_PROMPTS
     : QUICK_PROMPTS.filter(p => p.category === selectedCategory)
-  if (hidden) return null
+  if (hidden) {
+    return (
+      <div className="fixed bottom-20 lg:bottom-6 right-0 z-40 animate-in slide-in-from-right-4">
+        <button 
+          onClick={() => setHidden(false)}
+          title="Munculkan AI"
+          className="bg-sky-600/50 hover:bg-sky-600 text-white p-2 rounded-l-xl shadow-md border border-r-0 border-sky-400/30 backdrop-blur-md transition-all"
+        >
+          <Bot size={20} />
+        </button>
+      </div>
+    )
+  }
 
   return (
     <>
@@ -153,9 +165,9 @@ export default function AiRecommendationWidget() {
             style={{ zIndex: -1 }}
           />
           <Draggable handle=".ai-handle" cancel="button" nodeRef={windowRef}>
-            <div ref={windowRef} className="relative pointer-events-auto w-full sm:w-[520px] max-h-[75vh] sm:max-h-[600px] bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl border border-gray-100 flex flex-col overflow-hidden">
+            <div ref={windowRef} className="relative pointer-events-auto w-[94vw] sm:w-[520px] max-h-[75vh] sm:max-h-[600px] bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl border border-gray-100 flex flex-col overflow-hidden">
               {/* Window Header */}
-              <div className="ai-handle cursor-move px-4 py-3 bg-gradient-to-r from-[#1268A5] via-[#1A4F7C] to-[#15324A] text-white flex items-center justify-between shrink-0 shadow-sm">
+              <div style={{ touchAction: 'none' }} className="ai-handle cursor-move px-4 py-3 bg-gradient-to-r from-[#1268A5] via-[#1A4F7C] to-[#15324A] text-white flex items-center justify-between shrink-0 shadow-sm">
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-xl bg-white/15 flex items-center justify-center border border-white/20 shadow-xs">
                   <Bot size={18} className="text-sky-300" />
