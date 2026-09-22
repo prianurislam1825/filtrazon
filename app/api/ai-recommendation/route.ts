@@ -1,3 +1,4 @@
+export const maxDuration = 60;
 import { type NextRequest } from 'next/server'
 import { auth } from '@/lib/auth'
 import { generateExpertRecommendation, type TelemetryData } from '@/lib/ai/recommendation'
@@ -106,7 +107,7 @@ Gunakan bahasa ${lang === 'id' ? 'Indonesia' : 'English'} dengan format Markdown
           temperature: 0.3,
           max_tokens: 1200
         }),
-        signal: AbortSignal.timeout(15000),
+        signal: AbortSignal.timeout(45000),
       })
 
       if (orRes.ok) {
@@ -140,6 +141,6 @@ Gunakan bahasa ${lang === 'id' ? 'Indonesia' : 'English'} dengan format Markdown
     timestamp: new Date().toISOString(),
     model: 'FILTRAZON Research-Backed AI Engine',
     source: 'expert-fallback',
-    quotaNotice: 'Gemini API key terpasang di sistem. Saat respons AI lambat, sistem akan otomatis beralih ke Fallback Offline.',
+    quotaNotice: 'OpenRouter API key terpasang di sistem. Saat respons AI lambat, sistem akan otomatis beralih ke Fallback Offline.',
   })
 }
