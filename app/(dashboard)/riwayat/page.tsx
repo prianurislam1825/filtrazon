@@ -334,12 +334,12 @@ export default function RiwayatPage() {
               <table className="w-full text-xs min-w-[900px]">
                 <thead>
                   <tr className="border-b border-gray-100 bg-gray-50/40">
-                    {[lang === 'id' ? 'Waktu' : 'Time', 'Seq', 'pH', 'TDS',
-                      lang === 'id' ? 'Kekeruhan' : 'Turbidity',
-                      lang === 'id' ? 'Laju Alir' : 'Flow Rate',
-                      lang === 'id' ? 'Total Air' : 'Total Water',
+                    {[lang === 'id' ? 'Waktu' : 'Time', 'Seq', 'pH', 'TDS (ppm)',
+                      lang === 'id' ? 'Kekeruhan (NTU)' : 'Turbidity (NTU)',
+                      lang === 'id' ? 'Laju Alir (L/m)' : 'Flow Rate (L/m)',
+                      lang === 'id' ? 'Total Air (L)' : 'Total Water (L)',
                       lang === 'id' ? 'GPS' : 'GPS',
-                      lang === 'id' ? 'Pompa' : 'Pump', 'UV', 'RSSI', 'SNR', 'Status']
+                      lang === 'id' ? 'Pompa' : 'Pump', 'UV', 'RSSI (dBm)', 'SNR', 'Status']
                       .map(h => (
                         <th key={h} className="px-4 py-2.5 text-left text-[10px] font-black text-gray-500 uppercase tracking-wider whitespace-nowrap">{h}</th>
                       ))}
