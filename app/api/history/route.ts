@@ -52,7 +52,7 @@ export async function GET(request: NextRequest): Promise<Response> {
 
   // ── Local/mock mode ────────────────────────────────────────
   const { generateMockHistory, readingsToTelemetryRows } = await import('@/lib/mock/telemetry')
-  const allReadings = generateMockHistory(200, 5000)
+  const allReadings = generateMockHistory(9, 60000)
 
   // Apply filters
   let filtered = allReadings
