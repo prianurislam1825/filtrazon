@@ -36,7 +36,7 @@ const DUMMY_NODES: NodeLocation[] = [
   {
     id: 'FILTRAZON-01',
     name: 'Unit Filtrasi 01',
-    zone: 'Posko Pengungsian Utama Cianjur',
+    zone: 'Lokasi Operasional Aktif',
     lat: -6.8228,
     lon: 107.1407,
     altitude: 452,
