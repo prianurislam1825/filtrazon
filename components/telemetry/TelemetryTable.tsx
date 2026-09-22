@@ -15,11 +15,11 @@ function formatTime(iso: string): string {
 
 function DesktopTable({ rows, lang }: { rows: TelemetryRow[]; lang: 'id'|'en' }) {
   const cols = lang === 'id'
-    ? ['Waktu','Seq','pH','TDS','Kekeruhan','Laju Alir','RSSI','Status']
-    : ['Time', 'Seq','pH','TDS','Turbidity', 'Flow',     'RSSI','Status']
+    ? ['Waktu','Seq','pH','TDS','Kekeruhan','Laju Alir','Total Air','RSSI','Status']
+    : ['Time', 'Seq','pH','TDS','Turbidity', 'Flow Rate', 'Total Water', 'RSSI','Status']
   return (
     <div className="overflow-x-auto">
-      <table className="w-full text-xs min-w-[700px]">
+      <table className="w-full text-xs min-w-[750px]">
         <thead>
           <tr className="border-b border-gray-100 bg-gray-50/60">
             {cols.map(col => (
@@ -38,6 +38,7 @@ function DesktopTable({ rows, lang }: { rows: TelemetryRow[]; lang: 'id'|'en' })
               <td className="px-4 py-2.5 font-medium text-gray-800">{row.tds.toFixed(0)} <span className="text-gray-400 font-normal">ppm</span></td>
               <td className="px-4 py-2.5 font-medium text-gray-800">{row.turbidity.toFixed(0)} <span className="text-gray-400 font-normal">NTU</span></td>
               <td className="px-4 py-2.5 font-medium text-gray-800">{row.flow_lpm.toFixed(2)} <span className="text-gray-400 font-normal">L/min</span></td>
+              <td className="px-4 py-2.5 font-medium text-gray-800">{row.total_liters?.toFixed(1) ?? '—'} <span className="text-gray-400 font-normal">L</span></td>
               <td className="px-4 py-2.5 font-mono text-gray-600">{row.rssi} dBm</td>
               <td className="px-4 py-2.5"><StatusBadge status={row.status} size="sm" /></td>
             </tr>
@@ -51,7 +52,8 @@ function DesktopTable({ rows, lang }: { rows: TelemetryRow[]; lang: 'id'|'en' })
 function MobileCard({ row, lang }: { row: TelemetryRow; lang: 'id'|'en' }) {
   const L = {
     turbidity: lang === 'id' ? 'Kekeruhan' : 'Turbidity',
-    flow:      lang === 'id' ? 'Laju Alir' : 'Flow',
+    flow:      lang === 'id' ? 'Laju Alir' : 'Flow Rate',
+    total:     lang === 'id' ? 'Total Air' : 'Total Water',
   }
   return (
     <div className="p-3 border-b border-gray-50 last:border-0">
@@ -76,8 +78,12 @@ function MobileCard({ row, lang }: { row: TelemetryRow; lang: 'id'|'en' }) {
           <span className="text-[10px] text-gray-400">{L.flow}</span>
           <span className="text-xs font-semibold text-gray-800">{row.flow_lpm.toFixed(2)} L/min</span>
         </div>
+        <div className="flex justify-between">
+          <span className="text-[10px] text-gray-400">{L.total}</span>
+          <span className="text-xs font-semibold text-gray-800">{row.total_liters?.toFixed(1) ?? '—'} L</span>
+        </div>
       </div>
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-50">
         <span className="text-[10px] font-mono text-gray-400">{row.rssi} dBm</span>
         <StatusBadge status={row.status} size="sm" />
       </div>
