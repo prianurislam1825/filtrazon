@@ -114,24 +114,34 @@ export default function AiRecommendationWidget() {
     <>
       {/* ── Floating Trigger Button ── */}
       <div className="fixed bottom-20 lg:bottom-6 right-4 sm:right-6 z-40">
-        <button
-          onClick={() => setOpen(prev => !prev)}
-          aria-label="Buka AI Advisor"
-          className="group relative flex items-center gap-2.5 px-4 py-3 rounded-full bg-gradient-to-r from-[#1268A5] via-[#2185D0] to-[#5BBCEB] text-white shadow-xl shadow-sky-500/25 hover:shadow-2xl hover:shadow-sky-500/40 hover:scale-105 active:scale-95 transition-all duration-200 border border-white/20"
-        >
-          {/* Glowing pulse ring */}
-          <span className="absolute -inset-0.5 rounded-full bg-gradient-to-r from-sky-400 to-indigo-500 opacity-75 blur-sm group-hover:opacity-100 animate-pulse -z-10" />
+        <div className="relative group">
+          {/* Close / Hide Button */}
+          <button
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setHidden(true); }}
+            className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center transition-opacity z-50 shadow-md hover:bg-red-600"
+            title="Sembunyikan AI"
+          >
+            <X size={12} />
+          </button>
+          <button
+            onClick={() => setOpen(prev => !prev)}
+            aria-label="Buka AI Advisor"
+            className="group relative flex items-center gap-2.5 px-4 py-3 rounded-full bg-gradient-to-r from-[#1268A5] via-[#2185D0] to-[#5BBCEB] text-white shadow-xl shadow-sky-500/25 hover:shadow-2xl hover:shadow-sky-500/40 hover:scale-105 active:scale-95 transition-all duration-200 border border-white/20"
+          >
+            {/* Glowing pulse ring */}
+            <span className="absolute -inset-0.5 rounded-full bg-gradient-to-r from-sky-400 to-indigo-500 opacity-75 blur-sm group-hover:opacity-100 animate-pulse -z-10" />
 
-          <div className="w-6 h-6 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-            <Sparkles size={14} className="text-yellow-200 animate-spin" style={{ animationDuration: '4s' }} />
-          </div>
-          <span className="text-xs font-bold tracking-wide flex items-center gap-1.5">
-            AI Water Advisor
-            <span className="px-1.5 py-0.5 text-[9px] font-black uppercase rounded-full bg-white/20 text-white border border-white/30">
-              Research
+            <div className="w-6 h-6 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+              <Sparkles size={14} className="text-yellow-200 animate-spin" style={{ animationDuration: '4s' }} />
+            </div>
+            <span className="text-xs font-bold tracking-wide flex items-center gap-1.5">
+              AI Water Advisor
+              <span className="px-1.5 py-0.5 text-[9px] font-black uppercase rounded-full bg-white/20 text-white border border-white/30">
+                Research
+              </span>
             </span>
-          </span>
-        </button>
+          </button>
+        </div>
       </div>
 
       {/* ── AI Recommendation Widget Window ── */}

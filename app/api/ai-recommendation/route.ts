@@ -43,7 +43,7 @@ export async function POST(request: NextRequest): Promise<Response> {
   const lang = body.lang ?? 'id'
   const userPrompt = body.userPrompt?.trim()
 
-  // 🚀 1. Coba panggil Google Gemini 1.5 Flash jika API key tersedia 🚀
+  // 🚀 1. Coba panggil Google Gemini Flash jika API key tersedia 🚀
   const geminiApiKey = process.env.GEMINI_API_KEY || 'AIzaSyDs8ZBQEXlGsgPXSL_r5Rj3Y6F05CY17vU'
 
   if (geminiApiKey) {
@@ -82,7 +82,7 @@ Gunakan bahasa ${lang === 'id' ? 'Indonesia' : 'English'} dengan format Markdown
       : `${telemetryContext}\n\nBerikan analisis kelayakan air komprehensif, evaluasi anomali sensor/hardware, langkah taktis operasional, dan saran keselamatan konsumsi.`
 
     try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${geminiApiKey}`
       const geminiRes = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -103,7 +103,7 @@ Gunakan bahasa ${lang === 'id' ? 'Indonesia' : 'English'} dengan format Markdown
             recommendation: content,
             telemetry: t,
             timestamp: new Date().toISOString(),
-            model: 'Gemini 1.5 Flash',
+            model: 'Gemini Flash',
             source: 'gemini',
           })
         }
