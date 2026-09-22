@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import Draggable from 'react-draggable'
 import {
   Sparkles, X, Send, Bot, RefreshCw, AlertTriangle,
   CheckCircle2, Droplets, Gauge, Waves, Activity,
@@ -37,8 +36,6 @@ export default function AiRecommendationWidget() {
   const [selectedCategory, setSelectedCategory] = useState<string>('Semua')
   const [hidden, setHidden] = useState(false)
   const chatScrollRef = useRef<HTMLDivElement>(null)
-  const fabRef = useRef<HTMLDivElement>(null)
-  const windowRef = useRef<HTMLDivElement>(null)
 
   if (hidden) return null
 
@@ -153,11 +150,9 @@ export default function AiRecommendationWidget() {
             className="absolute inset-0 bg-black/40 backdrop-blur-sm sm:hidden pointer-events-auto"
             style={{ zIndex: -1 }}
           />
-
-          <Draggable handle=".ai-handle" nodeRef={windowRef}>
-            <div ref={windowRef} className="relative pointer-events-auto w-full sm:w-[520px] max-h-[90vh] sm:max-h-[780px] bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl border border-gray-100 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-200">
-              {/* Window Header */}
-              <div className="ai-handle cursor-move px-4 py-3 bg-gradient-to-r from-[#1268A5] via-[#1A4F7C] to-[#15324A] text-white flex items-center justify-between shrink-0 shadow-sm">
+          <div className="relative pointer-events-auto w-full sm:w-[520px] max-h-[75vh] sm:max-h-[600px] bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl border border-gray-100 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-200">
+            {/* Window Header */}
+            <div className="ai-handle cursor-move px-4 py-3 bg-gradient-to-r from-[#1268A5] via-[#1A4F7C] to-[#15324A] text-white flex items-center justify-between shrink-0 shadow-sm">
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-xl bg-white/15 flex items-center justify-center border border-white/20 shadow-xs">
                   <Bot size={18} className="text-sky-300" />
@@ -320,8 +315,7 @@ export default function AiRecommendationWidget() {
                 </button>
               </div>
             </form>
-            </div>
-          </Draggable>
+          </div>
         </div>
       )}
     </>
