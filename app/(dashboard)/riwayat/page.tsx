@@ -69,7 +69,10 @@ function DesktopRow({ row, lang }: { row: TelemetryRow; lang: 'id' | 'en' }) {
       <td className="px-4 py-2.5 text-xs"><ColorValue value={row.tds} metric="tds" /></td>
       <td className="px-4 py-2.5 text-xs"><ColorValue value={row.turbidity} metric="turbidity" /></td>
       <td className="px-4 py-2.5 text-xs"><ColorValue value={row.flow_lpm} metric="flow" pumpOn={row.pump_status} /></td>
-      <td className="px-4 py-2.5 text-xs font-semibold text-gray-700">{row.total_liters?.toFixed(1) ?? '—'}</td>
+      <td className="px-4 py-2.5 text-xs font-semibold text-gray-700">{row.total_liters?.toFixed(1) ?? '???'}</td>
+      <td className="px-4 py-2.5 text-[9px] text-gray-400 font-mono whitespace-nowrap">
+        {row.lat ? `${row.lat}, ${row.lon}` : '-'}
+      </td>
       <td className="px-4 py-2.5 text-xs">
         <span className={`font-bold ${row.pump_status ? 'text-green-600' : 'text-gray-400'}`}>
           {row.pump_status ? (lang === 'id' ? 'NYALA' : 'ON') : (lang === 'id' ? 'MATI' : 'OFF')}
@@ -115,6 +118,10 @@ function MobileCard({ row, lang }: { row: TelemetryRow; lang: 'id' | 'en' }) {
         <div className="flex justify-between">
           <span className="text-gray-400">{lang === 'id' ? 'Kekeruhan' : 'Turbidity'}</span>
           <span><ColorValue value={row.turbidity} metric="turbidity" /> <span className="text-gray-400">NTU</span></span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-gray-400">GPS</span>
+          <span className="text-[9px] text-gray-500 font-mono mt-0.5">{row.lat ? `${row.lat}, ${row.lon}` : '-'}</span>
         </div>
         <div className="flex justify-between">
           <span className="text-gray-400">{lang === 'id' ? 'Laju Alir' : 'Flow Rate'}</span>
@@ -331,6 +338,7 @@ export default function RiwayatPage() {
                       lang === 'id' ? 'Kekeruhan' : 'Turbidity',
                       lang === 'id' ? 'Laju Alir' : 'Flow Rate',
                       lang === 'id' ? 'Total Air' : 'Total Water',
+                      lang === 'id' ? 'GPS' : 'GPS',
                       lang === 'id' ? 'Pompa' : 'Pump', 'UV', 'RSSI', 'SNR', 'Status']
                       .map(h => (
                         <th key={h} className="px-4 py-2.5 text-left text-[10px] font-black text-gray-500 uppercase tracking-wider whitespace-nowrap">{h}</th>
