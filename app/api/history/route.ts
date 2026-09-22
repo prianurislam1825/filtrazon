@@ -32,6 +32,7 @@ export async function GET(request: NextRequest): Promise<Response> {
           tds:         r.tds,
           turbidity:   r.turbidity,
           flow_lpm:    r.flow_lpm,
+          total_liters: r.total_liters ?? 0,
           rssi:        r.rssi,
           snr:         r.snr,
           pump_status: !!r.pump_status,

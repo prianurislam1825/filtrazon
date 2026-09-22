@@ -281,6 +281,7 @@ export interface TelemetryRow {
   tds: number
   turbidity: number
   flow_lpm: number
+  total_liters: number
   rssi: number
   snr: number
   pump_status: boolean

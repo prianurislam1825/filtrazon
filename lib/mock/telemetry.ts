@@ -160,6 +160,7 @@ export function readingsToTelemetryRows(readings: Reading[]): TelemetryRow[] {
       tds:         r.tds,
       turbidity:   r.turbidity,
       flow_lpm:    r.flow_lpm,
+      total_liters: r.total_liters,
       rssi:        r.rssi,
       snr:         r.snr,
       pump_status: r.pump_status,

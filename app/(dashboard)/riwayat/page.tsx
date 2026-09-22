@@ -69,6 +69,7 @@ function DesktopRow({ row, lang }: { row: TelemetryRow; lang: 'id' | 'en' }) {
       <td className="px-4 py-2.5 text-xs"><ColorValue value={row.tds} metric="tds" /></td>
       <td className="px-4 py-2.5 text-xs"><ColorValue value={row.turbidity} metric="turbidity" /></td>
       <td className="px-4 py-2.5 text-xs"><ColorValue value={row.flow_lpm} metric="flow" pumpOn={row.pump_status} /></td>
+      <td className="px-4 py-2.5 text-xs font-semibold text-gray-700">{row.total_liters?.toFixed(1) ?? '—'}</td>
       <td className="px-4 py-2.5 text-xs">
         <span className={`font-bold ${row.pump_status ? 'text-green-600' : 'text-gray-400'}`}>
           {row.pump_status ? (lang === 'id' ? 'NYALA' : 'ON') : (lang === 'id' ? 'MATI' : 'OFF')}
@@ -116,8 +117,12 @@ function MobileCard({ row, lang }: { row: TelemetryRow; lang: 'id' | 'en' }) {
           <span><ColorValue value={row.turbidity} metric="turbidity" /> <span className="text-gray-400">NTU</span></span>
         </div>
         <div className="flex justify-between">
-          <span className="text-gray-400">{lang === 'id' ? 'Aliran' : 'Flow'}</span>
+          <span className="text-gray-400">{lang === 'id' ? 'Laju Alir' : 'Flow Rate'}</span>
           <span><ColorValue value={row.flow_lpm} metric="flow" pumpOn={row.pump_status} /> <span className="text-gray-400">L/min</span></span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-gray-400">{lang === 'id' ? 'Total Air' : 'Total Water'}</span>
+          <span className="font-semibold text-gray-700">{row.total_liters?.toFixed(1) ?? '—'} <span className="text-gray-400">L</span></span>
         </div>
         <div className="flex justify-between">
           <span className="text-gray-400">{lang === 'id' ? 'Pompa' : 'Pump'}</span>
@@ -295,7 +300,7 @@ export default function RiwayatPage() {
               status={evaluateTds(avgTds).status as 'safe' | 'warning' | 'danger'} />
             <SummaryCard label={lang === 'id' ? 'Avg Kekeruhan' : 'Avg Turbidity'} value={avgTurb.toFixed(0)} unit="NTU"
               status={evaluateTurbidity(avgTurb).status as 'safe' | 'warning' | 'danger'} />
-            <SummaryCard label={lang === 'id' ? 'Avg Aliran' : 'Avg Flow'} value={avgFlow.toFixed(2)} unit="L/min"
+            <SummaryCard label={lang === 'id' ? 'Avg Laju Alir' : 'Avg Flow Rate'} value={avgFlow.toFixed(2)} unit="L/min"
               status={evaluateFlow(avgFlow, true).status as 'safe' | 'warning' | 'danger'} />
           </div>
         )}
@@ -324,7 +329,8 @@ export default function RiwayatPage() {
                   <tr className="border-b border-gray-100 bg-gray-50/40">
                     {[lang === 'id' ? 'Waktu' : 'Time', 'Seq', 'pH', 'TDS',
                       lang === 'id' ? 'Kekeruhan' : 'Turbidity',
-                      lang === 'id' ? 'Aliran' : 'Flow',
+                      lang === 'id' ? 'Laju Alir' : 'Flow Rate',
+                      lang === 'id' ? 'Total Air' : 'Total Water',
                       lang === 'id' ? 'Pompa' : 'Pump', 'UV', 'RSSI', 'SNR', 'Status']
                       .map(h => (
                         <th key={h} className="px-4 py-2.5 text-left text-[10px] font-black text-gray-500 uppercase tracking-wider whitespace-nowrap">{h}</th>
