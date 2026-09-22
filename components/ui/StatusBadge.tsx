@@ -7,14 +7,15 @@ interface StatusBadgeProps {
   label?:    string
   size?:     'sm' | 'md' | 'lg'
   className?: string
+  lang?:     'id' | 'en'
 }
 
-const LABEL_MAP: Record<StatusLevel, string> = {
-  safe:    'Safe',
-  warning: 'Warning',
-  danger:  'Danger',
-  offline: 'Offline',
-  unknown: 'Unknown',
+const LABEL_MAP: Record<StatusLevel, Record<'id' | 'en', string>> = {
+  safe:    { id: 'Aman',    en: 'Safe' },
+  warning: { id: 'Waspada', en: 'Warning' },
+  danger:  { id: 'Bahaya',  en: 'Danger' },
+  offline: { id: 'Offline', en: 'Offline' },
+  unknown: { id: 'Unknown', en: 'Unknown' },
 }
 
 const SIZE_MAP = {
@@ -28,8 +29,9 @@ export default function StatusBadge({
   label,
   size = 'md',
   className = '',
+  lang = 'id',
 }: StatusBadgeProps) {
-  const displayLabel = label ?? LABEL_MAP[status]
+  const displayLabel = label ?? LABEL_MAP[status]?.[lang] ?? status
 
   return (
     <span

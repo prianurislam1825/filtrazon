@@ -14,10 +14,10 @@ import type { TelemetryRow } from '@/types'
 const PAGE_SIZE = 20
 
 // ── Inline color badge ────────────────────────────────────────
-function StatusDot({ status }: { status: 'safe' | 'warning' | 'danger' | 'offline' | 'unknown' }) {
+function StatusDot({ status, lang = 'id' }: { status: 'safe' | 'warning' | 'danger' | 'offline' | 'unknown', lang?: 'id' | 'en' }) {
   const c = {
     safe:    { bg: '#F0FDF4', text: '#15803D', border: '#BBF7D0', label: { id: 'Aman',    en: 'Safe'    } },
-    warning: { bg: '#FFFBEB', text: '#92400E', border: '#FDE68A', label: { id: 'Waspada', en: 'Caution' } },
+    warning: { bg: '#FFFBEB', text: '#92400E', border: '#FDE68A', label: { id: 'Waspada', en: 'Warning' } },
     danger:  { bg: '#FEF2F2', text: '#B91C1C', border: '#FECACA', label: { id: 'Bahaya',  en: 'Danger'  } },
     offline: { bg: '#F8FAFC', text: '#64748B', border: '#E2E8F0', label: { id: 'Offline', en: 'Offline' } },
     unknown: { bg: '#F8FAFC', text: '#64748B', border: '#E2E8F0', label: { id: 'Unknown', en: 'Unknown' } },
@@ -27,7 +27,7 @@ function StatusDot({ status }: { status: 'safe' | 'warning' | 'danger' | 'offlin
   return (
     <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full"
       style={{ background: c.bg, color: c.text, border: `1px solid ${c.border}` }}>
-      {emoji} {c.label.id}
+      {emoji} {c.label[lang]}
     </span>
   )
 }
@@ -82,7 +82,7 @@ function DesktopRow({ row, lang }: { row: TelemetryRow; lang: 'id' | 'en' }) {
       </td>
       <td className="px-4 py-2.5 text-xs font-mono text-gray-600">{row.rssi}</td>
       <td className="px-4 py-2.5 text-xs font-mono text-gray-600">{row.snr}</td>
-      <td className="px-4 py-2.5"><StatusDot status={row.status} /></td>
+      <td className="px-4 py-2.5"><StatusDot status={row.status} lang={lang} /></td>
     </tr>
   )
 }
@@ -100,7 +100,7 @@ function MobileCard({ row, lang }: { row: TelemetryRow; lang: 'id' | 'en' }) {
       {/* Header */}
       <div className="flex items-center justify-between mb-2">
         <span className="text-[11px] font-mono text-gray-500">{formatDateTime(row.received_at)}</span>
-        <StatusDot status={row.status} />
+        <StatusDot status={row.status} lang={lang} />
       </div>
       {/* Sensor grid */}
       <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs">
