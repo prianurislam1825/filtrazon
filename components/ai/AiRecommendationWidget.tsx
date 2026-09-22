@@ -39,7 +39,6 @@ export default function AiRecommendationWidget() {
   const chatScrollRef = useRef<HTMLDivElement>(null)
   const windowRef = useRef<HTMLDivElement>(null)
 
-  if (hidden) return null
 
   // Fetch AI recommendation
   async function fetchRecommendation(customPrompt?: string) {
@@ -108,6 +107,7 @@ export default function AiRecommendationWidget() {
   const filteredPrompts = selectedCategory === 'Semua'
     ? QUICK_PROMPTS
     : QUICK_PROMPTS.filter(p => p.category === selectedCategory)
+  if (hidden) return null
 
   return (
     <>
@@ -153,7 +153,7 @@ export default function AiRecommendationWidget() {
             style={{ zIndex: -1 }}
           />
           <Draggable handle=".ai-handle" cancel="button" nodeRef={windowRef}>
-            <div ref={windowRef} className="relative pointer-events-auto w-full sm:w-[520px] max-h-[75vh] sm:max-h-[600px] bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl border border-gray-100 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-200">
+            <div ref={windowRef} className="relative pointer-events-auto w-full sm:w-[520px] max-h-[75vh] sm:max-h-[600px] bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl border border-gray-100 flex flex-col overflow-hidden">
               {/* Window Header */}
               <div className="ai-handle cursor-move px-4 py-3 bg-gradient-to-r from-[#1268A5] via-[#1A4F7C] to-[#15324A] text-white flex items-center justify-between shrink-0 shadow-sm">
               <div className="flex items-center gap-2.5">
