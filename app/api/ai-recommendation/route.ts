@@ -43,8 +43,10 @@ export async function POST(request: NextRequest): Promise<Response> {
   const lang = body.lang ?? 'id'
   const userPrompt = body.userPrompt?.trim()
 
-  // ── 1. Coba panggil OpenAI GPT-4o-mini jika API key tersedia ──
-  if (apiKey) {
+  // 🚀 1. Coba panggil Google Gemini 1.5 Flash jika API key tersedia 🚀
+  const geminiApiKey = process.env.GEMINI_API_KEY || 'AIzaSyDs8ZBQEXlGsgPXSL_r5Rj3Y6F05CY17vU'
+
+  if (geminiApiKey) {
     const systemPrompt = `Anda adalah FILTRAZON AI Advisor — asisten pakar teknik lingkungan, kimia air, dan sistem purifikasi air minum portabel IoT bertenaga surya untuk tanggap darurat bencana (FILTRAZON).
 
 Basis Riset & Standar Internasional/Nasional yang Wajib Dirujuk:
@@ -54,9 +56,9 @@ Basis Riset & Standar Internasional/Nasional yang Wajib Dirujuk:
 4. US EPA Drinking Water Regulations & NSF/ANSI Standard 55 (UV-C 254nm dosis >= 40 mJ/cm2).
 
 Parameter Baku Mutu:
-- pH: 6.50 – 8.50 (Asam: korosif; Basa: pahit & kerak kalsium).
-- TDS: <= 300 ppm (Ideal), 300 – 500 ppm (Batas Wajar), > 500 ppm (Tinggi/Payau, wajib RO).
-- Kekeruhan: <= 1.0 – 5.0 NTU (Air Minum), 5 – 25 NTU (Darurat Bencana), > 100 NTU (Banjir, butuh pengendapan & backwash).
+- pH: 6.50 — 8.50 (Asam: korosif; Basa: pahit & kerak kalsium).
+- TDS: <= 300 ppm (Ideal), 300 — 500 ppm (Batas Wajar), > 500 ppm (Tinggi/Payau, wajib RO).
+- Kekeruhan: <= 1.0 — 5.0 NTU (Air Minum), 5 — 25 NTU (Darurat Bencana), > 100 NTU (Banjir, butuh pengendapan & backwash).
 - Flow Rate: Jika Pompa ON & Flow <= 0.1 L/min -> Clogging/dry-run!
 - UV Sterilizer: Wajib ON saat pompa mengalirkan air minum untuk eradikasi E. Coli & kista patogen.
 
@@ -80,42 +82,41 @@ Gunakan bahasa ${lang === 'id' ? 'Indonesia' : 'English'} dengan format Markdown
       : `${telemetryContext}\n\nBerikan analisis kelayakan air komprehensif, evaluasi anomali sensor/hardware, langkah taktis operasional, dan saran keselamatan konsumsi.`
 
     try {
-      const openaiRes = await fetch('https://api.openai.com/v1/chat/completions', {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`
+      const geminiRes = await fetch(url, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${apiKey}`,
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'gpt-4o-mini',
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: userMessage },
-          ],
-          temperature: 0.3,
-          max_tokens: 1200,
+          systemInstruction: { parts: [{ text: systemPrompt }] },
+          contents: [{ parts: [{ text: userMessage }] }],
+          generationConfig: { temperature: 0.3, maxOutputTokens: 1200 }
         }),
-        signal: AbortSignal.timeout(12000),
+        signal: AbortSignal.timeout(15000),
       })
 
-      if (openaiRes.ok) {
-        const data = await openaiRes.json()
-        const content = data.choices?.[0]?.message?.content
+      if (geminiRes.ok) {
+        const data = await geminiRes.json()
+        const content = data.candidates?.[0]?.content?.parts?.[0]?.text
         if (content) {
           return Response.json({
             ok: true,
             recommendation: content,
             telemetry: t,
             timestamp: new Date().toISOString(),
-            model: data.model ?? 'gpt-4o-mini',
-            source: 'openai',
+            model: 'Gemini 1.5 Flash',
+            source: 'gemini',
           })
         }
+      } else {
+        const errObj = await geminiRes.json().catch(() => ({}))
+        console.error('[Gemini API Error]', geminiRes.status, errObj)
       }
-    } catch {}
+    } catch (err) {
+      console.error('[Gemini Request Error]', err)
+    }
   }
 
-  // ── 2. Fallback cerdas berbasis riset ilmiah & NLP keyword search ─────
+  // 🚀 2. Fallback cerdas berbasis riset ilmiah & NLP keyword search 🚀
   const expertText = generateExpertRecommendation(t, userPrompt, lang)
   return Response.json({
     ok: true,
@@ -124,6 +125,6 @@ Gunakan bahasa ${lang === 'id' ? 'Indonesia' : 'English'} dengan format Markdown
     timestamp: new Date().toISOString(),
     model: 'FILTRAZON Research-Backed AI Engine',
     source: 'expert-fallback',
-    quotaNotice: apiKey ? 'OpenAI API key terpasang di sistem. Saat kuota akun aktif, sistem akan otomatis memanfaatkan GPT-4o-mini.' : null,
+    quotaNotice: 'Gemini API key terpasang di sistem. Saat respons AI lambat, sistem akan otomatis beralih ke Fallback Offline.',
   })
 }
