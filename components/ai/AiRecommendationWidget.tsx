@@ -157,7 +157,7 @@ export default function AiRecommendationWidget() {
 
       {/* ── AI Recommendation Widget Window ── */}
       {open && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-end sm:p-6 pointer-events-none">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:justify-end sm:p-6 pb-[85px] sm:pb-0 pointer-events-none">
           {/* Backdrop for mobile */}
           <div
             onClick={() => setOpen(false)}
