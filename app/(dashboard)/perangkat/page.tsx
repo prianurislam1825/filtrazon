@@ -20,13 +20,13 @@ function fmtUptime(ms?: number): string {
   return h > 24 ? `${Math.floor(h / 24)}d ${h % 24}h` : `${h}h ${m}m`
 }
 
-function fmtAgo(iso?: string | null): string {
+function fmtAgo(iso?: string | null, lang: 'id' | 'en' = 'id'): string {
   if (!iso) return '—'
   const ms = Date.now() - new Date(iso).getTime()
-  if (ms < 5_000)     return 'Baru saja'
-  if (ms < 60_000)    return `${Math.floor(ms / 1000)}s lalu`
-  if (ms < 3_600_000) return `${Math.floor(ms / 60_000)}m lalu`
-  return `${Math.floor(ms / 3_600_000)}h lalu`
+  if (ms < 5_000)     return lang === 'id' ? 'Baru saja' : 'Just now'
+  if (ms < 60_000)    return lang === 'id' ? `${Math.floor(ms / 1000)}d lalu` : `${Math.floor(ms / 1000)}s ago`
+  if (ms < 3_600_000) return lang === 'id' ? `${Math.floor(ms / 60_000)}m lalu` : `${Math.floor(ms / 60_000)}m ago`
+  return lang === 'id' ? `${Math.floor(ms / 3_600_000)}j lalu` : `${Math.floor(ms / 3_600_000)}h ago`
 }
 
 function InfoRow({ label, value, color }: { label: string; value: React.ReactNode; color?: string }) {
@@ -143,7 +143,7 @@ export default function PerangkatPage() {
           <div className="flex items-center gap-2">
             {lastFetch && (
               <span className="text-[10px] text-gray-400 hidden sm:block">
-                {T.updated[lang]} {fmtAgo(lastFetch)}
+                {T.updated[lang]} {fmtAgo(lastFetch, lang)}
               </span>
             )}
             <button onClick={fetchDevices} aria-label="Refresh"
@@ -199,7 +199,7 @@ export default function PerangkatPage() {
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 mb-4">
                     <InfoRow label={T.uptime[lang]}  value={fmtUptime(node.uptime_ms)} />
                     <InfoRow label={T.lastSeq[lang]}  value={node.last_seq ? `#${node.last_seq}` : '—'} />
-                    <InfoRow label={T.lastSeen[lang]}  value={fmtAgo(node.last_seen)} />
+                    <InfoRow label={T.lastSeen[lang]}  value={fmtAgo(node.last_seen, lang)} />
                     <InfoRow label={T.firmware[lang]}  value={node.firmware ?? '—'} />
                     <InfoRow label={T.backup[lang]}
                       value={node.sd_backup ? (lang === 'id' ? 'Aktif' : 'Active') : (lang === 'id' ? 'Mati' : 'Off')}
@@ -304,7 +304,7 @@ export default function PerangkatPage() {
                   <InfoRow label={T.queued[lang]}
                     value={String(gateway.queued_packets ?? 0)}
                     color={(gateway.queued_packets ?? 0) > 10 ? '#F59E0B' : '#15803D'} />
-                  <InfoRow label={T.lastSync[lang]} value={fmtAgo(gateway.last_sync)} />
+                  <InfoRow label={T.lastSync[lang]} value={fmtAgo(gateway.last_sync, lang)} />
                 </div>
 
                 <div className="mt-3 pt-3 border-t border-gray-100 flex flex-wrap gap-3 text-[10px]">

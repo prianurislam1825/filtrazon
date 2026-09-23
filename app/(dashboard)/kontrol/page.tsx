@@ -157,7 +157,7 @@ export default function KontrolPage() {
         {loading ? (
           <div className="card p-8 flex items-center justify-center gap-2 text-gray-400">
             <RefreshCw size={16} className="animate-spin text-[#5BBCEB]" />
-            <span className="text-sm">Menghubungkan ke Firebase...</span>
+            <span className="text-sm">{lang === 'id' ? 'Menghubungkan ke Firebase...' : 'Connecting to Firebase...'}</span>
           </div>
         ) : (
           <RelayControl firebaseReading={fbReading} onRelayUpdate={handleRelayUpdate} />
@@ -167,15 +167,15 @@ export default function KontrolPage() {
         {fbReading && (
           <div className="card p-4">
             <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">
-              Status Saat Ini (dari Firebase)
+              {lang === 'id' ? 'Status Saat Ini (dari Firebase)' : 'Current Status (from Firebase)'}
             </p>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {(
                 [
-                  { label: 'Pompa', value: fbReading.pump_status },
-                  { label: 'UV',    value: fbReading.uv_status   },
-                  { label: 'Relay 3', value: fbReading.relay3    },
-                  { label: 'Relay 4', value: fbReading.relay4    },
+                  { label: lang === 'id' ? 'Pompa' : 'Pump', value: fbReading.pump_status },
+                  { label: 'UV',                              value: fbReading.uv_status   },
+                  { label: 'Relay 3',                        value: fbReading.relay3       },
+                  { label: 'Relay 4',                        value: fbReading.relay4       },
                 ] as { label: string; value: boolean }[]
               ).map(item => (
                 <div key={item.label} className="p-2.5 rounded-lg bg-gray-50 text-center">
@@ -199,14 +199,14 @@ export default function KontrolPage() {
         {/* Command guide */}
         <div className="card p-4">
           <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
-            Protokol Command
+            {lang === 'id' ? 'Protokol Command' : 'Command Protocol'}
           </p>
           <div className="text-[11px] text-gray-400 space-y-1 font-mono">
             <p>Web → POST /api/control → Firebase /filtrazon/cmd</p>
             <p>Gateway ← polling Firebase /cmd</p>
             <p>Gateway → LoRa → Node (ESP32)</p>
             <p>Node → ACK → Gateway → Firebase /latest</p>
-            <p>Dashboard membaca /latest → status diperbarui</p>
+            <p>{lang === 'id' ? 'Dashboard membaca /latest → status diperbarui' : 'Dashboard reads /latest → status updated'}</p>
           </div>
           <div className="mt-3 flex flex-wrap gap-1.5">
             {['R1ON','R1OFF','R2ON','R2OFF','R3ON','R3OFF','R4ON','R4OFF','ALLON','ALLOFF','FLOWRESET'].map(cmd => (

@@ -61,7 +61,15 @@ const DUMMY_NODES: NodeLocation[] = [
 export default function PetaPage() {
   const { latestReading } = useDashboard()
   const { lang } = useLang()
-  const [nodes, setNodes] = useState<NodeLocation[]>(DUMMY_NODES)
+  const [nodes, setNodes] = useState<NodeLocation[]>(() => DUMMY_NODES.map(n => ({
+    ...n,
+    statusLabel: n.status === 'active'
+      ? (lang === 'id' ? 'Aktif Menyaring' : 'Filtering Active')
+      : n.status === 'warning'
+      ? (lang === 'id' ? 'Perhatian' : 'Warning')
+      : 'Standby',
+    lastFix: lang === 'id' ? 'Baru saja' : 'Just now',
+  })))
   const [selectedId, setSelectedId] = useState<string>(DUMMY_NODES[0].id)
   const [filter, setFilter] = useState<'all' | 'active' | 'standby' | 'warning'>('all')
   const [isUpdating, setIsUpdating] = useState(false)
