@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
-import { CheckCircle2, MessageCircle, Sun, Smartphone, WifiOff, Bell, BarChart2, FileText, HelpCircle, ChevronLeft, ChevronRight, Tag } from 'lucide-react'
+import { CheckCircle2, MessageCircle, Sun, Smartphone, WifiOff, Bell, BarChart2, FileText, HelpCircle, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useLang } from '@/lib/i18n/context'
 
 function useReveal() {
@@ -26,13 +26,11 @@ function useReveal() {
   return ref
 }
 
-// Map tiap fitur ke icon Lucide
 const FEATURE_ICONS = [
   CheckCircle2, Smartphone, Sun, WifiOff,
   Bell, BarChart2, FileText, HelpCircle,
 ]
 
-// Slide images for the product carousel
 const SLIDES = [
   {
     src: '/ProdukAsli.jpg',
@@ -51,36 +49,31 @@ export default function ProductSection() {
   const ref      = useReveal()
   const [slide, setSlide] = useState(0)
   const [fading, setFading] = useState(false)
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
-  // Auto-slide every 4 seconds
-  useEffect(() => {
-    function next() {
+  function startTimer() {
+    if (timerRef.current) clearInterval(timerRef.current)
+    timerRef.current = setInterval(() => {
       setFading(true)
       setTimeout(() => {
         setSlide(s => (s + 1) % SLIDES.length)
         setFading(false)
       }, 350)
-    }
-    timerRef.current = setInterval(next, 4000)
+    }, 4000)
+  }
+
+  useEffect(() => {
+    startTimer()
     return () => { if (timerRef.current) clearInterval(timerRef.current) }
   }, [])
 
   function goTo(idx: number) {
     if (idx === slide) return
-    if (timerRef.current) clearInterval(timerRef.current)
+    startTimer()
     setFading(true)
     setTimeout(() => {
       setSlide(idx)
       setFading(false)
-      // Restart auto-slide
-      timerRef.current = setInterval(() => {
-        setFading(true)
-        setTimeout(() => {
-          setSlide(s => (s + 1) % SLIDES.length)
-          setFading(false)
-        }, 350)
-      }, 4000)
     }, 350)
   }
 
@@ -93,27 +86,27 @@ export default function ProductSection() {
       en: 'One complete device to filter water and ensure its safety. Portable, works without grid power, and monitored from your phone.',
     },
     included: [
-      { id: 'Saring air kotor jadi bersih',     en: 'Filters dirty water clean'     },
-      { id: 'Pantau kondisi air dari ponsel',    en: 'Monitor water from phone'       },
-      { id: 'Nyala pakai panel surya',           en: 'Powered by solar panel'         },
-      { id: 'Tetap jalan tanpa internet',        en: 'Works without internet'         },
-      { id: 'Kirim notifikasi jika ada masalah', en: 'Sends alert if problem occurs'  },
-      { id: 'Simpan data otomatis',              en: 'Saves data automatically'       },
-      { id: 'Bisa laporan CSV',                  en: 'CSV report export'              },
-      { id: 'Setup & panduan gratis',            en: 'Free setup & guide'             },
+      { id: 'Saring air kotor jadi bersih',     en: 'Filters dirty water clean'    },
+      { id: 'Pantau kondisi air dari ponsel',    en: 'Monitor water from phone'     },
+      { id: 'Nyala pakai panel surya',           en: 'Powered by solar panel'       },
+      { id: 'Tetap jalan tanpa internet',        en: 'Works without internet'       },
+      { id: 'Kirim notifikasi jika ada masalah', en: 'Sends alert if problem occurs'},
+      { id: 'Simpan data otomatis',              en: 'Saves data automatically'     },
+      { id: 'Bisa laporan CSV',                  en: 'CSV report export'            },
+      { id: 'Setup & panduan gratis',            en: 'Free setup & guide'           },
     ],
     cloudLabel: { id: 'Mode Online',  en: 'Online Mode'  },
     cloudDesc:  { id: 'Pantau dari mana saja lewat internet', en: 'Monitor from anywhere via internet' },
     localLabel: { id: 'Mode Offline', en: 'Offline Mode' },
     localDesc:  { id: 'Tetap berfungsi tanpa internet sama sekali', en: 'Works fully without any internet' },
-    order:   { id: 'Pesan Sekarang', en: 'Order Now'    },
-    phLabel: { id: 'pH Air',         en: 'Water pH'     },
-    safe:    { id: 'Aman',           en: 'Safe'         },
-    liters:  { id: 'Sudah Diproses', en: 'Processed'    },
-    priceOri:{ id: 'Harga Normal',   en: 'Regular Price' },
-    priceNow:{ id: 'Harga Spesial',  en: 'Special Price' },
-    perUnit: { id: '/unit',          en: '/unit'         },
-    discount:{ id: 'Hemat 11%',      en: 'Save 11%'      },
+    order:   { id: 'Pesan Sekarang', en: 'Order Now'  },
+    phLabel: { id: 'pH Air',         en: 'Water pH'   },
+    safe:    { id: 'Aman',           en: 'Safe'        },
+    liters:  { id: 'Sudah Diproses', en: 'Processed'  },
+    was:     { id: 'Harga normal',   en: 'Was'         },
+    get:     { id: 'Dapatkan',       en: 'Get it for'  },
+    perUnit: { id: '/unit',          en: '/unit'       },
+    limited: { id: '🔥 Harga Terbatas!', en: '🔥 Limited Offer!' },
   }
 
   return (
@@ -129,48 +122,52 @@ export default function ProductSection() {
         [data-anim="scale"] { transform: scale(0.88) translateY(16px); }
         [data-anim].anim-in { opacity: 1; transform: none; }
 
-        /* CTA pulse ring */
         @keyframes cta-ring {
           0%   { box-shadow: 0 0 0 0   rgba(37,211,102,0.5); }
-          70%  { box-shadow: 0 0 0 12px rgba(37,211,102,0);   }
-          100% { box-shadow: 0 0 0 0   rgba(37,211,102,0);   }
+          70%  { box-shadow: 0 0 0 12px rgba(37,211,102,0);  }
+          100% { box-shadow: 0 0 0 0   rgba(37,211,102,0);  }
         }
         .cta-pulse { animation: cta-ring 2s ease-out infinite; }
 
-        /* Floating sensor card */
         @keyframes float-alt {
           0%,100% { transform: translateY(0px); }
           50%     { transform: translateY(-10px); }
         }
         .float-a { animation: float-alt 3.5s ease-in-out infinite; }
-        .float-b { animation: float-alt 4s   ease-in-out infinite; animation-delay:.8s; }
+        .float-b { animation: float-alt 4s ease-in-out infinite; animation-delay:.8s; }
 
-        /* Carousel gradient border */
+        /* Gradient border card */
         .product-card-border {
           background: linear-gradient(white, white) padding-box,
-                      linear-gradient(135deg, #0096C7, #43A047, #1268A5) border-box;
+                      linear-gradient(135deg, #0096C7 0%, #43A047 50%, #1268A5 100%) border-box;
           border: 3px solid transparent;
         }
 
-        /* Price badge wobble */
-        @keyframes badge-in {
-          0%   { transform: rotate(-8deg) scale(0.8); opacity: 0; }
-          60%  { transform: rotate(4deg)  scale(1.08); opacity: 1; }
-          100% { transform: rotate(-4deg) scale(1); opacity: 1; }
-        }
-        .price-badge { animation: badge-in 0.6s ease-out both; animation-delay: 0.8s; }
+        .slide-fade { transition: opacity 0.35s ease; }
+        .slide-fade.fading { opacity: 0 !important; }
 
-        /* Starburst */
-        .starburst {
-          clip-path: polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);
+        /* Price tag entrance */
+        @keyframes price-drop {
+          0%   { opacity: 0; transform: translateY(-16px) rotate(-3deg); }
+          60%  { transform: translateY(4px) rotate(1.5deg); }
+          100% { opacity: 1; transform: translateY(0) rotate(-2deg); }
         }
+        .price-tag { animation: price-drop 0.5s ease-out 0.7s both; }
 
-        /* Slide fade */
-        .slide-fade {
-          transition: opacity 0.35s ease;
+        /* Shine sweep on price card */
+        @keyframes shine {
+          0%   { left: -80%; }
+          100% { left: 130%; }
         }
-        .slide-fade.fading {
-          opacity: 0;
+        .price-shine::after {
+          content: '';
+          position: absolute;
+          top: 0; left: -80%;
+          width: 60%; height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+          transform: skewX(-20deg);
+          animation: shine 3s ease-in-out 1.2s infinite;
+          pointer-events: none;
         }
       `}</style>
 
@@ -188,97 +185,105 @@ export default function ProductSection() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
 
             {/* ── LEFT: image carousel ── */}
-            <div className="relative flex items-center justify-center order-2 lg:order-1"
+            <div className="relative flex flex-col items-center justify-center order-2 lg:order-1"
               data-anim="left" data-delay="80">
 
               {/* Glow background */}
               <div className="absolute inset-0 rounded-3xl blur-3xl opacity-15 pointer-events-none"
-                style={{ background:'radial-gradient(circle, #0096C7 30%, #43A047 70%)' }} />
+                style={{ background: 'radial-gradient(circle, #0096C7 30%, #43A047 70%)' }} />
 
-              {/* Main card with gradient border */}
-              <div className="relative w-full max-w-sm product-card-border rounded-3xl shadow-2xl bg-white flex flex-col items-center justify-center p-6 hover:scale-[1.02] transition-transform duration-500 overflow-visible">
+              {/* ── PRICE TAG — floating above card ── */}
+              <div className="price-tag relative z-20 mb-3 self-end mr-4 sm:mr-6">
+                <div
+                  className="price-shine relative overflow-hidden rounded-2xl shadow-xl px-5 py-3 flex flex-col items-center"
+                  style={{
+                    background: 'linear-gradient(135deg, #1268A5 0%, #0E4F8A 100%)',
+                    transform: 'rotate(-2deg)',
+                  }}
+                >
+                  {/* Limited badge */}
+                  <span className="text-[10px] font-black text-yellow-300 uppercase tracking-widest mb-1">
+                    {T.limited[lang]}
+                  </span>
+                  {/* Was price - crossed */}
+                  <div className="flex items-center gap-1.5 mb-0.5">
+                    <span className="text-[11px] text-blue-200 font-medium">{T.was[lang]}:</span>
+                    <span className="text-sm font-bold text-red-300 line-through">$840 USD</span>
+                  </div>
+                  {/* Divider */}
+                  <div className="w-full h-px bg-white/20 mb-1.5" />
+                  {/* New price */}
+                  <div className="flex items-end gap-1">
+                    <span className="text-3xl font-black text-white leading-none">$750</span>
+                    <span className="text-sm font-bold text-sky-200 mb-0.5">USD{T.perUnit[lang]}</span>
+                  </div>
+                  {/* Savings pill */}
+                  <span className="mt-2 bg-green-400 text-green-900 text-[10px] font-black px-2.5 py-0.5 rounded-full">
+                    HEMAT $90 / SAVE $90
+                  </span>
+                </div>
+              </div>
+
+              {/* Main card with gradient border — FIXED SIZE */}
+              <div className="product-card-border relative w-[320px] h-[320px] sm:w-[380px] sm:h-[380px] rounded-3xl shadow-2xl bg-white flex flex-col items-center justify-center hover:scale-[1.02] transition-transform duration-500 overflow-hidden">
 
                 {/* Spinning dashed ring */}
                 <div className="absolute inset-6 rounded-full border-2 border-dashed border-blue-200/50 pointer-events-none"
-                  style={{ animation:'spin 25s linear infinite' }} />
+                  style={{ animation: 'spin 25s linear infinite' }} />
 
-                {/* Image slide */}
-                <div className={`slide-fade w-full aspect-square flex items-center justify-center ${fading ? 'fading' : ''}`}>
-                  <Image
-                    src={SLIDES[slide].src}
-                    alt={SLIDES[slide].alt}
-                    width={400}
-                    height={400}
-                    className="object-contain w-full h-full rounded-2xl drop-shadow-xl"
-                  />
-                </div>
-
-                {/* Slide caption */}
-                <p className="text-[11px] font-semibold text-gray-400 mt-2 tracking-wide">
-                  {SLIDES[slide].caption[lang]}
-                </p>
-
-                {/* Dot indicators */}
-                <div className="flex gap-2 mt-3">
-                  {SLIDES.map((_, i) => (
-                    <button
-                      key={i}
-                      onClick={() => goTo(i)}
-                      aria-label={`Slide ${i + 1}`}
-                      className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                        slide === i
-                          ? 'bg-[#1268A5] w-5'
-                          : 'bg-gray-300 hover:bg-gray-400'
-                      }`}
+                {/* Image — fixed fill within fixed container */}
+                <div className={`slide-fade absolute inset-0 flex items-center justify-center p-5 ${fading ? 'fading' : ''}`}>
+                  <div className="relative w-full h-full">
+                    <Image
+                      src={SLIDES[slide].src}
+                      alt={SLIDES[slide].alt}
+                      fill
+                      className="object-contain drop-shadow-xl"
+                      sizes="380px"
                     />
-                  ))}
+                  </div>
                 </div>
 
                 {/* Prev / Next arrows */}
                 <button
                   onClick={() => goTo((slide - 1 + SLIDES.length) % SLIDES.length)}
-                  className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 border border-gray-200 shadow flex items-center justify-center text-gray-500 hover:text-[#1268A5] hover:border-[#1268A5] transition-colors"
+                  className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-white/90 border border-gray-200 shadow flex items-center justify-center text-gray-500 hover:text-[#1268A5] hover:border-[#1268A5] transition-colors"
                   aria-label="Previous"
                 >
                   <ChevronLeft size={15} />
                 </button>
                 <button
                   onClick={() => goTo((slide + 1) % SLIDES.length)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 border border-gray-200 shadow flex items-center justify-center text-gray-500 hover:text-[#1268A5] hover:border-[#1268A5] transition-colors"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-white/90 border border-gray-200 shadow flex items-center justify-center text-gray-500 hover:text-[#1268A5] hover:border-[#1268A5] transition-colors"
                   aria-label="Next"
                 >
                   <ChevronRight size={15} />
                 </button>
+              </div>
 
-                {/* ── PRICE BADGE (starburst) ── */}
-                <div className="price-badge absolute -top-5 -right-5 z-20">
-                  {/* Outer starburst */}
-                  <div
-                    className="starburst w-[110px] h-[110px] flex flex-col items-center justify-center shadow-xl"
-                    style={{ background: 'linear-gradient(135deg, #F5A623, #E8820C)' }}
-                  >
-                    {/* Crossed-out original price */}
-                    <span className="text-[11px] font-bold text-red-200 line-through leading-none">
-                      $840 USD
-                    </span>
-                    {/* New price */}
-                    <span className="text-[20px] font-black text-white leading-tight">
-                      $750
-                    </span>
-                    <span className="text-[11px] font-bold text-yellow-100 leading-none">
-                      USD{T.perUnit[lang]}
-                    </span>
-                  </div>
-                  {/* Discount ribbon */}
-                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-green-500 text-white text-[9px] font-black px-2.5 py-0.5 rounded-full whitespace-nowrap shadow-md flex items-center gap-1">
-                    <Tag size={8} />
-                    {T.discount[lang]}
-                  </div>
+              {/* Caption + Dot indicators below card */}
+              <div className="flex flex-col items-center mt-3 gap-2">
+                <p className={`slide-fade text-[11px] font-semibold text-gray-400 tracking-wide ${fading ? 'fading' : ''}`}>
+                  {SLIDES[slide].caption[lang]}
+                </p>
+                <div className="flex gap-2">
+                  {SLIDES.map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => goTo(i)}
+                      aria-label={`Slide ${i + 1}`}
+                      className={`h-2 rounded-full transition-all duration-300 ${
+                        slide === i
+                          ? 'bg-[#1268A5] w-6'
+                          : 'bg-gray-300 w-2 hover:bg-gray-400'
+                      }`}
+                    />
+                  ))}
                 </div>
               </div>
 
               {/* Floating sensor card — pH */}
-              <div className="absolute -right-2 sm:-right-6 top-1/4 bg-white rounded-2xl shadow-xl border border-blue-100 p-3 text-center float-a">
+              <div className="absolute -right-2 sm:-right-6 top-[30%] bg-white rounded-2xl shadow-xl border border-blue-100 p-3 text-center float-a z-10">
                 <p className="text-[10px] text-gray-400 font-medium mb-0.5">{T.phLabel[lang]}</p>
                 <p className="font-black text-[#0077B6] text-xl leading-none">7.2</p>
                 <span className="inline-flex items-center gap-1 text-[10px] font-bold text-green-600 bg-green-50 px-1.5 py-0.5 rounded-full mt-1">
@@ -288,7 +293,7 @@ export default function ProductSection() {
               </div>
 
               {/* Floating sensor card — liters */}
-              <div className="absolute -left-2 sm:-left-6 bottom-1/4 bg-white rounded-2xl shadow-xl border border-green-100 p-3 text-center float-b">
+              <div className="absolute -left-2 sm:-left-6 bottom-[22%] bg-white rounded-2xl shadow-xl border border-green-100 p-3 text-center float-b z-10">
                 <p className="text-[10px] text-gray-400 font-medium mb-0.5">{T.liters[lang]}</p>
                 <p className="font-black text-[#43A047] text-xl leading-none">1,284 L</p>
                 <div className="flex items-center justify-center gap-1 mt-1">
@@ -301,13 +306,11 @@ export default function ProductSection() {
             {/* ── RIGHT: info ── */}
             <div className="order-1 lg:order-2">
 
-              {/* Tagline + desc */}
               <div data-anim="right" data-delay="0">
                 <p className="font-bold text-[#D4A017] text-sm mb-1">{T.sub[lang]}</p>
                 <p className="text-gray-600 text-sm leading-relaxed mb-6">{T.desc[lang]}</p>
               </div>
 
-              {/* Feature list — stagger */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-7">
                 {T.included.map((item, i) => {
                   const Icon = FEATURE_ICONS[i] ?? CheckCircle2
@@ -328,7 +331,6 @@ export default function ProductSection() {
                 })}
               </div>
 
-              {/* Mode badges */}
               <div className="grid grid-cols-2 gap-3 mb-7" data-anim="right" data-delay="520">
                 <div className="p-4 rounded-2xl bg-blue-50 border border-blue-100 text-center
                                 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
@@ -348,7 +350,6 @@ export default function ProductSection() {
                 </div>
               </div>
 
-              {/* CTA — pulse ring */}
               <div data-anim="up" data-delay="600">
                 <a
                   href="https://wa.me/6281226615585"
