@@ -1,8 +1,8 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
-import { CheckCircle2, MessageCircle, Sun, Smartphone, WifiOff, Bell, BarChart2, FileText, HelpCircle } from 'lucide-react'
+import { CheckCircle2, MessageCircle, Sun, Smartphone, WifiOff, Bell, BarChart2, FileText, HelpCircle, ChevronLeft, ChevronRight, Tag } from 'lucide-react'
 import { useLang } from '@/lib/i18n/context'
 
 function useReveal() {
@@ -32,9 +32,57 @@ const FEATURE_ICONS = [
   Bell, BarChart2, FileText, HelpCircle,
 ]
 
+// Slide images for the product carousel
+const SLIDES = [
+  {
+    src: '/ProdukAsli.jpg',
+    alt: 'FILTRAZON - Box Terbuka',
+    caption: { id: 'Sistem Filter Aktif', en: 'Active Filter System' },
+  },
+  {
+    src: '/ProdukTertutup.jpg',
+    alt: 'FILTRAZON - Box Tertutup',
+    caption: { id: 'Mode Portabel', en: 'Portable Mode' },
+  },
+]
+
 export default function ProductSection() {
   const { lang } = useLang()
   const ref      = useReveal()
+  const [slide, setSlide] = useState(0)
+  const [fading, setFading] = useState(false)
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  // Auto-slide every 4 seconds
+  useEffect(() => {
+    function next() {
+      setFading(true)
+      setTimeout(() => {
+        setSlide(s => (s + 1) % SLIDES.length)
+        setFading(false)
+      }, 350)
+    }
+    timerRef.current = setInterval(next, 4000)
+    return () => { if (timerRef.current) clearInterval(timerRef.current) }
+  }, [])
+
+  function goTo(idx: number) {
+    if (idx === slide) return
+    if (timerRef.current) clearInterval(timerRef.current)
+    setFading(true)
+    setTimeout(() => {
+      setSlide(idx)
+      setFading(false)
+      // Restart auto-slide
+      timerRef.current = setInterval(() => {
+        setFading(true)
+        setTimeout(() => {
+          setSlide(s => (s + 1) % SLIDES.length)
+          setFading(false)
+        }, 350)
+      }, 4000)
+    }, 350)
+  }
 
   const T = {
     label:   { id: 'Produk Kami',             en: 'Our Product'        },
@@ -62,6 +110,10 @@ export default function ProductSection() {
     phLabel: { id: 'pH Air',         en: 'Water pH'     },
     safe:    { id: 'Aman',           en: 'Safe'         },
     liters:  { id: 'Sudah Diproses', en: 'Processed'    },
+    priceOri:{ id: 'Harga Normal',   en: 'Regular Price' },
+    priceNow:{ id: 'Harga Spesial',  en: 'Special Price' },
+    perUnit: { id: '/unit',          en: '/unit'         },
+    discount:{ id: 'Hemat 11%',      en: 'Save 11%'      },
   }
 
   return (
@@ -92,6 +144,34 @@ export default function ProductSection() {
         }
         .float-a { animation: float-alt 3.5s ease-in-out infinite; }
         .float-b { animation: float-alt 4s   ease-in-out infinite; animation-delay:.8s; }
+
+        /* Carousel gradient border */
+        .product-card-border {
+          background: linear-gradient(white, white) padding-box,
+                      linear-gradient(135deg, #0096C7, #43A047, #1268A5) border-box;
+          border: 3px solid transparent;
+        }
+
+        /* Price badge wobble */
+        @keyframes badge-in {
+          0%   { transform: rotate(-8deg) scale(0.8); opacity: 0; }
+          60%  { transform: rotate(4deg)  scale(1.08); opacity: 1; }
+          100% { transform: rotate(-4deg) scale(1); opacity: 1; }
+        }
+        .price-badge { animation: badge-in 0.6s ease-out both; animation-delay: 0.8s; }
+
+        /* Starburst */
+        .starburst {
+          clip-path: polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);
+        }
+
+        /* Slide fade */
+        .slide-fade {
+          transition: opacity 0.35s ease;
+        }
+        .slide-fade.fading {
+          opacity: 0;
+        }
       `}</style>
 
       <section id="produk" className="py-20 bg-white" ref={ref as React.RefObject<HTMLElement>}>
@@ -107,7 +187,7 @@ export default function ProductSection() {
 
           <div className="grid lg:grid-cols-2 gap-12 items-center">
 
-            {/* ── LEFT: image ── */}
+            {/* ── LEFT: image carousel ── */}
             <div className="relative flex items-center justify-center order-2 lg:order-1"
               data-anim="left" data-delay="80">
 
@@ -115,21 +195,86 @@ export default function ProductSection() {
               <div className="absolute inset-0 rounded-3xl blur-3xl opacity-15 pointer-events-none"
                 style={{ background:'radial-gradient(circle, #0096C7 30%, #43A047 70%)' }} />
 
-              {/* Main card */}
-              <div className="relative w-full max-w-sm aspect-square rounded-3xl overflow-hidden border border-gray-100 shadow-2xl bg-white flex items-center justify-center p-6
-                              hover:scale-[1.02] transition-transform duration-500">
+              {/* Main card with gradient border */}
+              <div className="relative w-full max-w-sm product-card-border rounded-3xl shadow-2xl bg-white flex flex-col items-center justify-center p-6 hover:scale-[1.02] transition-transform duration-500 overflow-visible">
 
                 {/* Spinning dashed ring */}
                 <div className="absolute inset-6 rounded-full border-2 border-dashed border-blue-200/50 pointer-events-none"
                   style={{ animation:'spin 25s linear infinite' }} />
 
-                <Image
-                  src="/ProdukAsli.jpg"
-                  alt="FILTRAZON Water System"
-                  width={400}
-                  height={400}
-                  className="object-contain w-full h-full rounded-2xl drop-shadow-xl animate-float"
-                />
+                {/* Image slide */}
+                <div className={`slide-fade w-full aspect-square flex items-center justify-center ${fading ? 'fading' : ''}`}>
+                  <Image
+                    src={SLIDES[slide].src}
+                    alt={SLIDES[slide].alt}
+                    width={400}
+                    height={400}
+                    className="object-contain w-full h-full rounded-2xl drop-shadow-xl"
+                  />
+                </div>
+
+                {/* Slide caption */}
+                <p className="text-[11px] font-semibold text-gray-400 mt-2 tracking-wide">
+                  {SLIDES[slide].caption[lang]}
+                </p>
+
+                {/* Dot indicators */}
+                <div className="flex gap-2 mt-3">
+                  {SLIDES.map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => goTo(i)}
+                      aria-label={`Slide ${i + 1}`}
+                      className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                        slide === i
+                          ? 'bg-[#1268A5] w-5'
+                          : 'bg-gray-300 hover:bg-gray-400'
+                      }`}
+                    />
+                  ))}
+                </div>
+
+                {/* Prev / Next arrows */}
+                <button
+                  onClick={() => goTo((slide - 1 + SLIDES.length) % SLIDES.length)}
+                  className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 border border-gray-200 shadow flex items-center justify-center text-gray-500 hover:text-[#1268A5] hover:border-[#1268A5] transition-colors"
+                  aria-label="Previous"
+                >
+                  <ChevronLeft size={15} />
+                </button>
+                <button
+                  onClick={() => goTo((slide + 1) % SLIDES.length)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 border border-gray-200 shadow flex items-center justify-center text-gray-500 hover:text-[#1268A5] hover:border-[#1268A5] transition-colors"
+                  aria-label="Next"
+                >
+                  <ChevronRight size={15} />
+                </button>
+
+                {/* ── PRICE BADGE (starburst) ── */}
+                <div className="price-badge absolute -top-5 -right-5 z-20">
+                  {/* Outer starburst */}
+                  <div
+                    className="starburst w-[110px] h-[110px] flex flex-col items-center justify-center shadow-xl"
+                    style={{ background: 'linear-gradient(135deg, #F5A623, #E8820C)' }}
+                  >
+                    {/* Crossed-out original price */}
+                    <span className="text-[11px] font-bold text-red-200 line-through leading-none">
+                      $840 USD
+                    </span>
+                    {/* New price */}
+                    <span className="text-[20px] font-black text-white leading-tight">
+                      $750
+                    </span>
+                    <span className="text-[11px] font-bold text-yellow-100 leading-none">
+                      USD{T.perUnit[lang]}
+                    </span>
+                  </div>
+                  {/* Discount ribbon */}
+                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-green-500 text-white text-[9px] font-black px-2.5 py-0.5 rounded-full whitespace-nowrap shadow-md flex items-center gap-1">
+                    <Tag size={8} />
+                    {T.discount[lang]}
+                  </div>
+                </div>
               </div>
 
               {/* Floating sensor card — pH */}
