@@ -1,0 +1,25 @@
+url = https://filtrazon-e4ab3-default-rtdb.asia-southeast1.firebasedatabase.app/filtrazon/devices/FILTRAZON-01/sensor/latest
+
+{
+  "device_id": "FILTRAZON-01",
+  "flags": 0,
+  "flow_lpm": 0,
+  "gateway": "GW-01",
+  "ph": 5.66,
+  "pressure_v": 0.442,
+  "pump_status": "OFF",
+  "relay1": "false",
+  "relay2": "false",
+  "relay3": "false",
+  "relay4": "false",
+  "rssi": -72,
+  "rx_ms": 5997867,
+  "seq": 278,
+  "snr": 9.5,
+  "tds": 299,
+  "total_liters": 0,
+  "turbidity": 2396,
+  "type": "sensor",
+  "uptime_ms": 8407650,
+  "uv_status": "OFF"
+}

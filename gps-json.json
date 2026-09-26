@@ -1,0 +1,21 @@
+url = https://filtrazon-e4ab3-default-rtdb.asia-southeast1.firebasedatabase.app/filtrazon/devices/FILTRAZON-01/gps/latest
+
+{
+  "altitude_m": 0,
+  "course_deg": 219.85001,
+  "device_id": "FILTRAZON-01",
+  "gateway": "GW-01",
+  "google_maps": "https://maps.google.com/?q=-7.578037,110.809731",
+  "gps_fix": "true",
+  "hdop": 99.99,
+  "latitude": -7.57804,
+  "longitude": 110.80973,
+  "rssi": -72,
+  "rx_ms": 5999420,
+  "satellites": 0,
+  "seq": 278,
+  "snr": 9.5,
+  "speed_kmph": 0.13,
+  "type": "gps",
+  "utc_time": "20:04:40"
+}

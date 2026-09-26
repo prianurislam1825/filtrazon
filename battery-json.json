@@ -1,0 +1,14 @@
+url = https://filtrazon-e4ab3-default-rtdb.asia-southeast1.firebasedatabase.app/filtrazon/devices/FILTRAZON-01/battery/latest
+
+{
+  "battery_current_a": 0,
+  "battery_remain_ah": 27,
+  "battery_soc": 100,
+  "device_id": "FILTRAZON-01",
+  "gateway": "GW-01",
+  "rssi": -77,
+  "rx_ms": 5726838,
+  "seq": 269,
+  "snr": 9,
+  "type": "batt"
+}

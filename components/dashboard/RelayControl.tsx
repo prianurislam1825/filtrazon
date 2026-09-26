@@ -141,8 +141,6 @@ export default function RelayControl({ firebaseReading, relayNames, onRelayUpdat
   const [states, setStates] = useState<Record<number, RelayState>>({
     1: { ...INITIAL_RELAY_STATE },
     2: { ...INITIAL_RELAY_STATE },
-    3: { ...INITIAL_RELAY_STATE },
-    4: { ...INITIAL_RELAY_STATE },
   })
 
   const resetTimers = useRef<Record<number, ReturnType<typeof setTimeout>>>({})
@@ -153,8 +151,6 @@ export default function RelayControl({ firebaseReading, relayNames, onRelayUpdat
     setLocalRelays(prev => ({
       1: states[1].cmdState !== 'idle' ? prev[1] : !!fb.relay1,
       2: states[2].cmdState !== 'idle' ? prev[2] : !!fb.relay2,
-      3: states[3].cmdState !== 'idle' ? prev[3] : !!fb.relay3,
-      4: states[4].cmdState !== 'idle' ? prev[4] : !!fb.relay4,
     }))
   }, [fb, states])
 
@@ -219,15 +215,13 @@ export default function RelayControl({ firebaseReading, relayNames, onRelayUpdat
     const errText = lang === 'id' ? 'Gagal' : 'Failed'
     const connErrText = lang === 'id' ? 'Koneksi error' : 'Connection error'
 
-    const allState = { 1: isTurningOn, 2: isTurningOn, 3: isTurningOn, 4: isTurningOn }
+    const allState = { 1: isTurningOn, 2: isTurningOn }
     setLocalRelays(allState)
     onRelayUpdate?.(allState)
 
     setStates({
       1: { cmdState: 'sending' },
       2: { cmdState: 'sending' },
-      3: { cmdState: 'sending' },
-      4: { cmdState: 'sending' },
     })
 
     try {
@@ -244,15 +238,11 @@ export default function RelayControl({ firebaseReading, relayNames, onRelayUpdat
         setStates({
           1: { cmdState: 'error', error: errText },
           2: { cmdState: 'error', error: errText },
-          3: { cmdState: 'error', error: errText },
-          4: { cmdState: 'error', error: errText },
         })
         setTimeout(() => {
           setStates({
             1: { cmdState: 'idle' },
             2: { cmdState: 'idle' },
-            3: { cmdState: 'idle' },
-            4: { cmdState: 'idle' },
           })
         }, 3000)
         return
@@ -261,15 +251,11 @@ export default function RelayControl({ firebaseReading, relayNames, onRelayUpdat
       setStates({
         1: { cmdState: 'success' },
         2: { cmdState: 'success' },
-        3: { cmdState: 'success' },
-        4: { cmdState: 'success' },
       })
       setTimeout(() => {
         setStates({
           1: { cmdState: 'idle' },
           2: { cmdState: 'idle' },
-          3: { cmdState: 'idle' },
-          4: { cmdState: 'idle' },
         })
       }, 1500)
     } catch {
@@ -278,15 +264,11 @@ export default function RelayControl({ firebaseReading, relayNames, onRelayUpdat
       setStates({
         1: { cmdState: 'error', error: connErrText },
         2: { cmdState: 'error', error: connErrText },
-        3: { cmdState: 'error', error: connErrText },
-        4: { cmdState: 'error', error: connErrText },
       })
       setTimeout(() => {
         setStates({
           1: { cmdState: 'idle' },
           2: { cmdState: 'idle' },
-          3: { cmdState: 'idle' },
-          4: { cmdState: 'idle' },
         })
       }, 3000)
     }
@@ -326,7 +308,7 @@ export default function RelayControl({ firebaseReading, relayNames, onRelayUpdat
 
       {/* Relay rows */}
       <div className="px-4 pb-2">
-        {([1, 2, 3, 4] as const).map(idx => (
+        {([1, 2] as const).map(idx => (
           <RelayRow
             key={idx}
             index={idx}
