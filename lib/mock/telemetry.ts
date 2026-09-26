@@ -100,33 +100,52 @@ export function generateMockReading(overrides: Partial<Reading> = {}): Reading {
 
 // ── Generate N historical readings — DB-like response ──────────────
 // Produces realistic variation: mostly safe, some warnings, occasional danger
-export function generateMockHistory(
+export async function generateMockHistory(
   count = 100,
   intervalMs = 5000,
-): Reading[] {
+): Promise<Reading[]> {
   const now = Date.now()
   const readings: Reading[] = []
+
+  // Ambil data terbaru dari Firebase sebagai basis
+  let basePh = 7.0, baseTds = 150, baseTurb = 2.0, baseFlow = 3.5
+  let baseBat = 85, baseRssi = -75, baseSnr = 8.0
+
+  try {
+    const { fetchFirebaseLatest } = await import('@/lib/firebase/client')
+    const fb = await fetchFirebaseLatest()
+    if (fb.ok && fb.data) {
+      basePh = fb.data.ph ?? basePh
+      baseTds = fb.data.tds ?? baseTds
+      baseTurb = fb.data.turbidity ?? baseTurb
+      baseFlow = fb.data.flow_lpm ?? baseFlow
+      baseBat = fb.data.battery ?? baseBat
+      baseRssi = fb.data.rssi ?? baseRssi
+      baseSnr = fb.data.snr ?? baseSnr
+    }
+  } catch {}
 
   for (let i = count; i >= 0; i--) {
     const ts    = new Date(now - i * intervalMs).toISOString()
     const seq   = 12548 - i
-    const base  = getScenario(i)
+    const isLatest = (i === 0)
 
-    // Add sinusoidal variation to simulate natural drift over time
-    const phDrift        = Math.sin(i * 0.12) * 0.3
-    const tdsDrift       = Math.sin(i * 0.08) * 25
-    const turbidityDrift = Math.sin(i * 0.15) * 18
-    const flowDrift      = Math.sin(i * 0.10) * 0.4
+    // Untuk data terbaru (index 0), gunakan angka persis dari Firebase
+    // Untuk masa lalu, beri variasi sedikit agar terlihat natural
+    const phVal = isLatest ? basePh : parseFloat(clamp(basePh + seededNoise(i, 0.2), 0, 14).toFixed(2))
+    const tdsVal = isLatest ? baseTds : parseFloat(clamp(baseTds + seededNoise(i*2, 10), 0, 2000).toFixed(1))
+    const turbVal = isLatest ? baseTurb : parseFloat(clamp(baseTurb + seededNoise(i*3, 5), 0, 3000).toFixed(1))
+    const flowVal = isLatest ? baseFlow : parseFloat(clamp(baseFlow + seededNoise(i*4, 0.2), 0, 30).toFixed(2))
 
     readings.push({
       id:           seq,
       device_id:    MOCK_DEVICE_ID,
       seq,
       uptime_ms:    48_000_000 + seq * 5000,
-      ph:           parseFloat((7.0 + Math.random() * 0.4 - 0.2).toFixed(2)),
-      tds:          parseFloat((150 + Math.random() * 20).toFixed(1)),
-      turbidity:    parseFloat((0.5 + Math.random() * 1.5).toFixed(1)), // Max ~2.0 (below 3)
-      flow_lpm:     parseFloat((3.5 + Math.random() * 0.5).toFixed(2)),
+      ph:           phVal,
+      tds:          tdsVal,
+      turbidity:    turbVal,
+      flow_lpm:     flowVal,
       total_liters: parseFloat((1200 + seq * 0.12).toFixed(1)),
       pump_status:  true,
       uv_status:    true,
@@ -135,9 +154,9 @@ export function generateMockHistory(
       relay3:       false,
       relay4:       false,
       flags:        0,
-      battery:      parseFloat(clamp(base.battery + seededNoise(i * 5, 1), 0, 100).toFixed(0)),
-      rssi:         parseFloat(clamp(base.rssi + seededNoise(i * 6, 2), -130, -30).toFixed(0)),
-      snr:          parseFloat(clamp(base.snr + seededNoise(i * 7, 0.8), -20, 20).toFixed(1)),
+      battery:      isLatest ? baseBat : parseFloat(clamp(baseBat + seededNoise(i * 5, 1), 0, 100).toFixed(0)),
+      rssi:         isLatest ? baseRssi : parseFloat(clamp(baseRssi + seededNoise(i * 6, 2), -130, -30).toFixed(0)),
+      snr:          isLatest ? baseSnr : parseFloat(clamp(baseSnr + seededNoise(i * 7, 0.8), -20, 20).toFixed(1)),
       gateway_id:   MOCK_GATEWAY_ID,
       gateway:      MOCK_GATEWAY_ID,
       rx_ms:        new Date(ts).getTime(),

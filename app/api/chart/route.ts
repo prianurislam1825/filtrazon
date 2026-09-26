@@ -51,7 +51,7 @@ export async function GET(request: NextRequest): Promise<Response> {
 
   // Local mode: generate mock chart data
   const { generateMockHistory, readingsToChartData, filterByRange } = await import('@/lib/mock/telemetry')
-  const history = generateMockHistory(200, 5000)
+  const history = await generateMockHistory(200, 5000)
   const filtered = filterByRange(history, range as '1H' | '6H' | '12H' | '24H')
   const points = readingsToChartData(filtered, metric)
   return Response.json({ ok: true, data: points, source: 'mock' })
