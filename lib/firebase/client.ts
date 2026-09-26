@@ -10,12 +10,15 @@ export const FIREBASE_BASE_URL =
 
 export const FIREBASE_DEVICE_PATH =
   process.env.FIREBASE_DEVICE_PATH ??
-  '/filtrazon/devices/FILTRAZON-01/latest'
+  '/filtrazon/devices/FILTRAZON-01/sensor/latest'
+
+export const FIREBASE_BATTERY_PATH =
+  '/filtrazon/devices/FILTRAZON-01/battery/latest'
 
 export const FIREBASE_GPS_PATH =
   '/filtrazon/devices/FILTRAZON-01/gps/latest'
 
-// Raw shape as stored in Firebase (pump_status / uv_status are strings)
+// Raw shape as stored in Firebase
 export interface FirebaseRawReading {
   device_id:   string
   gateway:     string
@@ -28,12 +31,12 @@ export interface FirebaseRawReading {
   total_liters: number
   pump_status: string | boolean  // "ON"/"OFF" or true/false
   uv_status:   string | boolean
-  relay1:      boolean
-  relay2:      boolean
-  relay3:      boolean
-  relay4:      boolean
+  relay1:      string | boolean
+  relay2:      string | boolean
+  relay3:      string | boolean
+  relay4:      string | boolean
   flags:       number            // bitmask: bit3 = demo mode
-  battery:     number
+  battery:     number            // will map from battery_soc
   rssi:        number
   snr:         number
   rx_ms:       number
@@ -54,12 +57,14 @@ export interface FirebaseFetchResult {
  */
 export async function fetchFirebaseLatest(): Promise<FirebaseFetchResult> {
   const url = `${FIREBASE_BASE_URL}${FIREBASE_DEVICE_PATH}.json`
+  const battUrl = `${FIREBASE_BASE_URL}${FIREBASE_BATTERY_PATH}.json`
   const gpsUrl = `${FIREBASE_BASE_URL}${FIREBASE_GPS_PATH}.json`
   const fetchedAt = new Date().toISOString()
 
   try {
-    const [res, gpsRes] = await Promise.all([
+    const [res, battRes, gpsRes] = await Promise.all([
       fetch(url, { next: { revalidate: 0 }, signal: AbortSignal.timeout(8000) }),
+      fetch(battUrl, { next: { revalidate: 0 }, signal: AbortSignal.timeout(8000) }).catch(() => null),
       fetch(gpsUrl, { next: { revalidate: 0 }, signal: AbortSignal.timeout(8000) }).catch(() => null)
     ])
 
@@ -67,22 +72,33 @@ export async function fetchFirebaseLatest(): Promise<FirebaseFetchResult> {
       return { ok: false, data: null, fetchedAt, error: `HTTP ${res.status}` }
     }
 
-    const raw = await res.json() as FirebaseRawReading | null
+    const raw = await res.json() as any
 
     if (!raw || typeof raw !== 'object') {
       return { ok: false, data: null, fetchedAt, error: 'Empty or null data' }
     }
 
-    // Try to merge GPS data if available
-    if (gpsRes && gpsRes.ok) {
-      const gpsData = await gpsRes.json().catch(() => null)
-      if (gpsData && typeof gpsData === 'object') {
-        if (typeof gpsData.latitude === 'number') raw.lat = gpsData.latitude
-        if (typeof gpsData.longitude === 'number') raw.lon = gpsData.longitude
+    // Default map from raw
+    let merged: FirebaseRawReading = { ...raw }
+
+    // Merge Battery data
+    if (battRes && battRes.ok) {
+      const battData = await battRes.json().catch(() => null)
+      if (battData && typeof battData === 'object') {
+        merged.battery = battData.battery_soc ?? raw.battery ?? -1
       }
     }
 
-    return { ok: true, data: raw, fetchedAt }
+    // Merge GPS data
+    if (gpsRes && gpsRes.ok) {
+      const gpsData = await gpsRes.json().catch(() => null)
+      if (gpsData && typeof gpsData === 'object') {
+        if (typeof gpsData.latitude === 'number') merged.lat = gpsData.latitude
+        if (typeof gpsData.longitude === 'number') merged.lon = gpsData.longitude
+      }
+    }
+
+    return { ok: true, data: merged, fetchedAt }
   } catch (err) {
     return {
       ok:        false,
@@ -96,7 +112,10 @@ export async function fetchFirebaseLatest(): Promise<FirebaseFetchResult> {
 /** Normalize "ON"/"OFF" or true/false → boolean */
 export function normalizeBool(v: string | boolean | undefined): boolean {
   if (typeof v === 'boolean') return v
-  if (typeof v === 'string')  return v.toUpperCase() === 'ON'
+  if (typeof v === 'string') {
+    const s = v.toUpperCase()
+    return s === 'ON' || s === 'TRUE'
+  }
   return false
 }
 
