@@ -2,14 +2,11 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import AppShell from '@/components/layout/AppShell'
-import RelayControl from '@/components/dashboard/RelayControl'
 import {
-  Cpu, RadioTower, RefreshCw, Battery, Signal,
-  ChevronDown, ChevronUp, SlidersHorizontal,
+  Cpu, RadioTower, RefreshCw, Signal
 } from 'lucide-react'
 import { evaluateBattery, evaluateRssi, evaluateSnr } from '@/lib/thresholds'
 import { useLang } from '@/lib/i18n/context'
-import { useDashboard } from '@/hooks/useDashboard'
 import type { Device, Gateway } from '@/types'
 
 const POLL_MS = 5000
@@ -69,15 +66,11 @@ function ConnPill({ on, label }: { on: boolean; label: string }) {
 export default function PerangkatPage() {
   const { lang }   = useLang()
 
-  // ── Ambil firebaseReading REAL dari useDashboard ──────────
-  const { firebaseReading, connectionStatus } = useDashboard()
-
   const [devices,  setDevices]   = useState<Device[]>([])
   const [gateways, setGateways]  = useState<Gateway[]>([])
   const [loading,  setLoading]   = useState(true)
   const [lastFetch,setLastFetch] = useState<string | null>(null)
   const [source,   setSource]    = useState('')
-  const [openControl, setOpenControl] = useState<string | null>(null)
 
   const fetchDevices = useCallback(async () => {
     try {
@@ -102,7 +95,6 @@ export default function PerangkatPage() {
   const node    = devices[0]  ?? null
   const gateway = gateways[0] ?? null
 
-  const batResult  = node    ? evaluateBattery(node.battery   ?? 0) : null
   const rssiResult = gateway ? evaluateRssi(gateway.last_rssi ?? 0) : null
   const snrResult  = gateway ? evaluateSnr(gateway.last_snr   ?? 0) : null
 
@@ -123,11 +115,6 @@ export default function PerangkatPage() {
     queued:   { id: 'Paket Antri',              en: 'Queued'            },
     lastSync: { id: 'Sinkronisasi',             en: 'Last Sync'         },
     liveData: { id: 'Diperbarui setiap',        en: 'Updates every'     },
-    // Kontrol
-    openCtrl:   { id: 'Buka Kontrol Relay',     en: 'Open Relay Control'  },
-    closeCtrl:  { id: 'Tutup Kontrol',          en: 'Close Control'       },
-    ctrlTitle:  { id: 'Kontrol Manual',         en: 'Manual Control'      },
-    ctrlSub:    { id: 'Kirim perintah relay ke node ini via Firebase', en: 'Send relay commands to this node via Firebase' },
   }
 
   return (
@@ -206,58 +193,14 @@ export default function PerangkatPage() {
                       color={node.sd_backup ? '#15803D' : '#92400E'} />
                   </div>
 
-                  {/* ── TOMBOL BUKA KONTROL ── */}
-                  <button
-                    onClick={() => setOpenControl(openControl === node.id ? null : node.id)}
-                    className={`
-                      w-full flex items-center justify-between gap-2
-                      px-4 py-3 rounded-xl text-sm font-bold
-                      transition-all duration-200
-                      ${openControl === node.id
-                        ? 'bg-[#0077B6] text-white shadow-md'
-                        : 'bg-[#E3F2FD] text-[#1565C0] hover:bg-[#BBDEFB]'}
-                    `}
-                    aria-expanded={openControl === node.id}
-                  >
-                    <span className="flex items-center gap-2">
-                      <SlidersHorizontal size={16} />
-                      {openControl === node.id ? T.closeCtrl[lang] : T.openCtrl[lang]}
-                    </span>
-                    {openControl === node.id
-                      ? <ChevronUp size={16} />
-                      : <ChevronDown size={16} />}
-                  </button>
+                  {/* Live indicator */}
+                  {node.status === 'online' && (
+                    <div className="px-4 pb-3 flex items-center gap-1.5 text-[10px] text-gray-400">
+                      <span className="w-1.5 h-1.5 rounded-full bg-sky-500 animate-pulse" />
+                      {T.liveData[lang]} {POLL_MS / 1000}s
+                    </div>
+                  )}
                 </div>
-
-                {/* ── PANEL KONTROL RELAY — expand/collapse ── */}
-                {openControl === node.id && (
-                  <div className="border-t border-blue-100 bg-[#F0F7FF]">
-                    {/* Sub-header kontrol */}
-                    <div className="flex items-center gap-2 px-4 py-2.5 border-b border-blue-100">
-                      <SlidersHorizontal size={13} className="text-[#1565C0]" />
-                      <div>
-                        <p className="text-xs font-black text-[#1565C0] uppercase tracking-wide">
-                          {T.ctrlTitle[lang]}
-                        </p>
-                        <p className="text-[10px] text-gray-400">{T.ctrlSub[lang]}</p>
-                      </div>
-                    </div>
-
-                    <div className="p-4">
-                      <RelayControl
-                        firebaseReading={firebaseReading}
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {/* Live indicator */}
-                {node.status === 'online' && (
-                  <div className="px-4 pb-3 flex items-center gap-1.5 text-[10px] text-gray-400">
-                    <span className="w-1.5 h-1.5 rounded-full bg-sky-500 animate-pulse" />
-                    {T.liveData[lang]} {POLL_MS / 1000}s
-                  </div>
-                )}
               </div>
             )}
 
