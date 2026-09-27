@@ -42,6 +42,7 @@ export interface FirebaseRawReading {
   rx_ms:       number
   lat?:        number
   lon?:        number
+  pressure_v?: number
 }
 
 export interface FirebaseFetchResult {

@@ -132,8 +132,8 @@ export default function DashboardPage() {
       <div className="px-4 md:px-6 pb-4 space-y-4">
 
         {isLoading ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-            {Array.from({ length: 5 }).map((_, i) => <MetricCardSkeleton key={i} />)}
+          <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3">
+            {Array.from({ length: 6 }).map((_, i) => <MetricCardSkeleton key={i} />)}
           </div>
         ) : !r ? (
           <div className="card"><EmptyState variant="no-data" /></div>
@@ -155,8 +155,8 @@ export default function DashboardPage() {
               />
             </div>
 
-            {/* ── Metric cards: 2-col mobile → 3-col tablet → 5-col desktop ── */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+            {/* ── Metric cards: 2-col mobile → 3-col tablet → 6-col desktop ── */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3">
               <MetricCard
                 label="pH"
                 value={r.ph.toFixed(2)}
@@ -200,18 +200,26 @@ export default function DashboardPage() {
                 metric="flow_lpm"
                 lang={lang}
               />
-              <div className="col-span-2 sm:col-span-1">
-                <MetricCard
-                  label={lang === 'id' ? 'Total Air' : 'Total Water'}
-                  value={r.total_liters.toLocaleString('id-ID', { maximumFractionDigits: 0 })}
-                  unit="L"
-                  icon={<Container size={26} />}
-                  status="safe"
-                  statusLabel={lang === 'id' ? 'Terakumulasi' : 'Accumulated'}
-                  lastUpdate={formatLastUpdate(r.received_at, lang)}
-                  lang={lang}
-                />
-              </div>
+              <MetricCard
+                label={lang === 'id' ? 'Tekanan' : 'Pressure'}
+                value={(r.pressure_v ?? 0).toFixed(3)}
+                unit="MPa"
+                icon={<Gauge size={26} />}
+                status="safe"
+                statusLabel={lang === 'id' ? 'Normal' : 'Normal'}
+                lastUpdate={formatLastUpdate(r.received_at, lang)}
+                lang={lang}
+              />
+              <MetricCard
+                label={lang === 'id' ? 'Total Air' : 'Total Water'}
+                value={r.total_liters.toLocaleString('id-ID', { maximumFractionDigits: 0 })}
+                unit="L"
+                icon={<Container size={26} />}
+                status="safe"
+                statusLabel={lang === 'id' ? 'Terakumulasi' : 'Accumulated'}
+                lastUpdate={formatLastUpdate(r.received_at, lang)}
+                lang={lang}
+              />
             </div>
 
             {/* ── Status panels row ── */}

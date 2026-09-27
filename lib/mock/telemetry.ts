@@ -110,6 +110,7 @@ export async function generateMockHistory(
   // Ambil data terbaru dari Firebase sebagai basis
   let basePh = 7.0, baseTds = 150, baseTurb = 2.0, baseFlow = 3.5
   let baseBat = 85, baseRssi = -75, baseSnr = 8.0
+  let basePressure = 0.44
 
   try {
     const { fetchFirebaseLatest } = await import('@/lib/firebase/client')
@@ -122,6 +123,7 @@ export async function generateMockHistory(
       baseBat = fb.data.battery ?? baseBat
       baseRssi = fb.data.rssi ?? baseRssi
       baseSnr = fb.data.snr ?? baseSnr
+      basePressure = fb.data.pressure_v ?? basePressure
     }
   } catch {}
 
@@ -136,6 +138,7 @@ export async function generateMockHistory(
     const tdsVal = isLatest ? baseTds : parseFloat(clamp(baseTds + seededNoise(i*2, 10), 0, 2000).toFixed(1))
     const turbVal = isLatest ? baseTurb : parseFloat(clamp(baseTurb + seededNoise(i*3, 5), 0, 3000).toFixed(1))
     const flowVal = isLatest ? baseFlow : parseFloat(clamp(baseFlow + seededNoise(i*4, 0.2), 0, 30).toFixed(2))
+    const pressVal = isLatest ? basePressure : parseFloat(clamp(basePressure + seededNoise(i*1.5, 0.05), 0, 10).toFixed(3))
 
     readings.push({
       id:           seq,
@@ -146,6 +149,7 @@ export async function generateMockHistory(
       tds:          tdsVal,
       turbidity:    turbVal,
       flow_lpm:     flowVal,
+      pressure_v:   pressVal,
       total_liters: parseFloat((1200 + seq * 0.12).toFixed(1)),
       pump_status:  true,
       uv_status:    true,
@@ -179,6 +183,7 @@ export function readingsToTelemetryRows(readings: Reading[]): TelemetryRow[] {
       tds:         r.tds,
       turbidity:   r.turbidity,
       flow_lpm:    r.flow_lpm,
+      pressure_v:  r.pressure_v,
       total_liters: r.total_liters,
       rssi:        r.rssi,
       snr:         r.snr,
@@ -274,6 +279,7 @@ export const MOCK_LATEST_READING: Reading = {
   tds:           245,
   turbidity:     82,
   flow_lpm:      2.8,
+  pressure_v:    0.44,
   total_liters:  1284.4,
   pump_status:   true,
   uv_status:     true,

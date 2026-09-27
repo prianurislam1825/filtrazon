@@ -13,6 +13,7 @@ export interface NodePayload {
   flow_lpm: number
     lat?: number
     lon?: number
+    pressure_v?: number
   total_liters: number
   pump_status: boolean
   uv_status: boolean
@@ -233,6 +234,7 @@ export interface FirebaseReading {
   rx_ms:        number
     lat?:         number
     lon?:         number
+    pressure_v?:  number
   fetched_at:   string   // ISO — when backend fetched from Firebase
 }
 
@@ -287,6 +289,7 @@ export interface TelemetryRow {
   flow_lpm: number
     lat?: number
     lon?: number
+    pressure_v?: number
   total_liters: number
   rssi: number
   snr: number

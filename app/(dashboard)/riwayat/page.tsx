@@ -83,6 +83,7 @@ function DesktopRow({ row, lang }: { row: TelemetryRow; lang: 'id' | 'en' }) {
       <td className="px-4 py-2.5 text-xs"><ColorValue value={row.tds} metric="tds" /></td>
       <td className="px-4 py-2.5 text-xs"><ColorValue value={row.turbidity} metric="turbidity" /></td>
       <td className="px-4 py-2.5 text-xs"><ColorValue value={row.flow_lpm} metric="flow" pumpOn={row.pump_status} /></td>
+      <td className="px-4 py-2.5 text-xs font-semibold text-gray-700">{(row.pressure_v ?? 0).toFixed(3)}</td>
       <td className="px-4 py-2.5 text-xs font-semibold text-gray-700">{row.total_liters?.toFixed(1) ?? '???'}</td>
       <td className="px-4 py-2.5 text-[9px] text-gray-400 font-mono whitespace-nowrap">
         {row.lat ? `${row.lat}, ${row.lon}` : '-'}
@@ -143,6 +144,10 @@ function MobileCard({ row, lang }: { row: TelemetryRow; lang: 'id' | 'en' }) {
         <div className="flex justify-between">
           <span className="text-gray-400">{lang === 'id' ? 'Laju Alir' : 'Flow Rate'}</span>
           <span><ColorValue value={row.flow_lpm} metric="flow" pumpOn={row.pump_status} /> <span className="text-gray-400">L/min</span></span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-gray-400">{lang === 'id' ? 'Tekanan' : 'Pressure'}</span>
+          <span><span className="font-semibold text-gray-700">{(row.pressure_v ?? 0).toFixed(3)}</span> <span className="text-gray-400">MPa</span></span>
         </div>
         <div className="flex justify-between">
           <span className="text-gray-400">{lang === 'id' ? 'Total Air' : 'Total Water'}</span>
@@ -370,6 +375,7 @@ export default function RiwayatPage() {
                     {[lang === 'id' ? 'Waktu' : 'Time', 'Seq', 'pH', 'TDS (ppm)',
                       lang === 'id' ? 'Kekeruhan (NTU)' : 'Turbidity (NTU)',
                       lang === 'id' ? 'Laju Alir (L/m)' : 'Flow Rate (L/m)',
+                      lang === 'id' ? 'Tekanan (MPa)' : 'Pressure (MPa)',
                       lang === 'id' ? 'Total Air (L)' : 'Total Water (L)',
                       lang === 'id' ? 'GPS' : 'GPS',
                       lang === 'id' ? 'Pompa' : 'Pump', 'UV', 'RSSI (dBm)', 'SNR', 'Status']
