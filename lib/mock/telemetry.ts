@@ -57,7 +57,7 @@ function getScenario(index: number): Scenario {
   }
   // Safe scenario — normal operation
   return {
-    ph: 7.2, tds: 245, turbidity: 82, flow_lpm: 2.8,
+    ph: 7.6, tds: 235, turbidity: 2.1, flow_lpm: 2.8,
     pump_status: true, uv_status: true,
     rssi: -78, snr: 8.5, battery: 87,
   }
@@ -107,38 +107,50 @@ export async function generateMockHistory(
   const now = Date.now()
   const readings: Reading[] = []
 
-  // Ambil data terbaru dari Firebase sebagai basis
-  let basePh = 7.0, baseTds = 150, baseTurb = 2.0, baseFlow = 3.5
-  let baseBat = 85, baseRssi = -75, baseSnr = 8.0
+  // ── Nilai dummy yang disediakan — cycling berulang ─────────────────
+  const DUMMY_PH   = [6.8, 7.8, 7.6, 7.9, 8.4]
+  const DUMMY_TURB = [2.1, 2.5, 2.4, 1.9, 2.9]
+  const DUMMY_TDS  = [285, 278, 235, 185, 290, 226, 237]
+
+  // Ambil data terbaru dari Firebase sebagai basis nilai paling baru
+  let basePh   = DUMMY_PH[0]
+  let baseTds  = DUMMY_TDS[0]
+  let baseTurb = DUMMY_TURB[0]
+  let baseFlow = 3.5
+  let baseBat  = 85, baseRssi = -75, baseSnr = 8.0
   let basePressure = 0.44
 
   try {
     const { fetchFirebaseLatest } = await import('@/lib/firebase/client')
     const fb = await fetchFirebaseLatest()
     if (fb.ok && fb.data) {
-      basePh = fb.data.ph ?? basePh
-      baseTds = fb.data.tds ?? baseTds
-      baseTurb = fb.data.turbidity ?? baseTurb
-      baseFlow = fb.data.flow_lpm ?? baseFlow
-      baseBat = fb.data.battery ?? baseBat
-      baseRssi = fb.data.rssi ?? baseRssi
-      baseSnr = fb.data.snr ?? baseSnr
+      basePh       = fb.data.ph       ?? basePh
+      baseTds      = fb.data.tds      ?? baseTds
+      baseTurb     = fb.data.turbidity ?? baseTurb
+      baseFlow     = fb.data.flow_lpm  ?? baseFlow
+      baseBat      = fb.data.battery   ?? baseBat
+      baseRssi     = fb.data.rssi      ?? baseRssi
+      baseSnr      = fb.data.snr       ?? baseSnr
       basePressure = fb.data.pressure_v ?? basePressure
     }
   } catch {}
 
   for (let i = count; i >= 0; i--) {
-    const ts    = new Date(now - i * intervalMs).toISOString()
-    const seq   = 12548 - i
+    const ts       = new Date(now - i * intervalMs).toISOString()
+    const seq      = 12548 - i
     const isLatest = (i === 0)
 
-    // Untuk data terbaru (index 0), gunakan angka persis dari Firebase
-    // Untuk masa lalu, beri variasi sedikit agar terlihat natural
-    const phVal = isLatest ? basePh : parseFloat(clamp(basePh + seededNoise(i, 0.2), 0, 14).toFixed(2))
-    const tdsVal = isLatest ? baseTds : parseFloat(clamp(baseTds + seededNoise(i*2, 10), 0, 2000).toFixed(1))
-    const turbVal = isLatest ? baseTurb : parseFloat(clamp(baseTurb + seededNoise(i*3, 5), 0, 3000).toFixed(1))
-    const flowVal = isLatest ? baseFlow : parseFloat(clamp(baseFlow + seededNoise(i*4, 0.2), 0, 30).toFixed(2))
-    const pressVal = isLatest ? basePressure : parseFloat(clamp(basePressure + seededNoise(i*1.5, 0.05), 0, 10).toFixed(3))
+    // Data terbaru: pakai nilai Firebase asli
+    // Data lama: cycling dummy values yang diberikan
+    const idx      = (count - i) % DUMMY_PH.length
+    const idxTds   = (count - i) % DUMMY_TDS.length
+    const idxTurb  = (count - i) % DUMMY_TURB.length
+
+    const phVal    = isLatest ? basePh   : DUMMY_PH[idx]
+    const tdsVal   = isLatest ? baseTds  : DUMMY_TDS[idxTds]
+    const turbVal  = isLatest ? baseTurb : DUMMY_TURB[idxTurb]
+    const flowVal  = parseFloat(clamp(baseFlow + seededNoise(i * 4, 0.2), 0, 30).toFixed(2))
+    const pressVal = parseFloat(clamp(basePressure + seededNoise(i * 1.5, 0.05), 0, 10).toFixed(3))
 
     readings.push({
       id:           seq,
@@ -158,9 +170,9 @@ export async function generateMockHistory(
       relay3:       false,
       relay4:       false,
       flags:        0,
-      battery:      isLatest ? baseBat : parseFloat(clamp(baseBat + seededNoise(i * 5, 1), 0, 100).toFixed(0)),
-      rssi:         isLatest ? baseRssi : parseFloat(clamp(baseRssi + seededNoise(i * 6, 2), -130, -30).toFixed(0)),
-      snr:          isLatest ? baseSnr : parseFloat(clamp(baseSnr + seededNoise(i * 7, 0.8), -20, 20).toFixed(1)),
+      battery:      parseFloat(clamp(baseBat + seededNoise(i * 5, 1), 0, 100).toFixed(0)),
+      rssi:         parseFloat(clamp(baseRssi + seededNoise(i * 6, 2), -130, -30).toFixed(0)),
+      snr:          parseFloat(clamp(baseSnr + seededNoise(i * 7, 0.8), -20, 20).toFixed(1)),
       gateway_id:   MOCK_GATEWAY_ID,
       gateway:      MOCK_GATEWAY_ID,
       rx_ms:        new Date(ts).getTime(),
@@ -275,9 +287,9 @@ export const MOCK_LATEST_READING: Reading = {
   device_id:     MOCK_DEVICE_ID,
   seq:           12548,
   uptime_ms:     48_392_000,
-  ph:            7.2,
-  tds:           245,
-  turbidity:     82,
+  ph:            7.6,
+  tds:           235,
+  turbidity:     2.1,
   flow_lpm:      2.8,
   pressure_v:    0.44,
   total_liters:  1284.4,
