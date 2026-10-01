@@ -9,7 +9,7 @@ const SENSOR_BUBBLES = [
   { icon: <Droplets size={12} />, label: 'pH', value: '7.8', color: '#42A5F5', top: '18%', left: '8%',  delay: '0s',    dur: '4s'   },
   { icon: <Gauge    size={12} />, label: 'TDS', value: '235 ppm', color: '#81C784', top: '65%', left: '5%',  delay: '0.8s',  dur: '5s'   },
   { icon: <Waves    size={12} />, label: 'Turb.', value: '2.1 NTU', color: '#FFD54F', top: '20%', right:'7%',  delay: '0.4s',  dur: '4.5s' },
-  { icon: <Activity size={12} />, label: 'Flow', value: '2.8 L/min', color: '#F48FB1', top: '70%', right:'6%',  delay: '1.2s',  dur: '5.5s' },
+  { icon: <Activity size={12} />, label: 'Flow', value: '3.0 L/min', color: '#F48FB1', top: '70%', right:'6%',  delay: '1.2s',  dur: '5.5s' },
 ]
 
 export default function HeroSection() {

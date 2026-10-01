@@ -160,11 +160,11 @@ export async function generateMockHistory(
     let r2: boolean
 
     if (i < 5) {
-      // 5 baris paling atas (terbaru): Dummy aman
+      // 5 baris paling atas (terbaru): Dummy aman dengan laju alir 3 L/min
       phVal      = DUMMY_PH[i % DUMMY_PH.length]
       tdsVal     = DUMMY_TDS[i % DUMMY_TDS.length]
       turbVal    = DUMMY_TURB[i % DUMMY_TURB.length]
-      flowVal    = basePump ? parseFloat(clamp(baseFlow + seededNoise(i * 4, 0.2), 0, 30).toFixed(2)) : 0
+      flowVal    = parseFloat(clamp(3.0 + seededNoise(i * 4, 0.15), 2.8, 3.2).toFixed(2))
       pressVal   = parseFloat(clamp(basePressure + seededNoise(i * 1.5, 0.05), 0, 10).toFixed(3))
       pumpStatus = basePump
       uvStatus   = baseUv
