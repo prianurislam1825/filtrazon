@@ -138,17 +138,20 @@ export async function generateMockHistory(
   for (let i = count; i >= 0; i--) {
     const ts       = new Date(now - i * intervalMs).toISOString()
     const seq      = 12548 - i
-    const isLatest = (i === 0)
 
-    // Data terbaru: pakai nilai Firebase asli
-    // Data lama: cycling dummy values yang diberikan
-    const idx      = (count - i) % DUMMY_PH.length
-    const idxTds   = (count - i) % DUMMY_TDS.length
-    const idxTurb  = (count - i) % DUMMY_TURB.length
+    // Data index dihitung dari yang paling baru (i = 0) ke yang lampau
+    // Sehingga saat di-reverse untuk tabel (terbaru di atas), baris 1, 2, 3...
+    // langsung berurutan menampilkan nilai dummy:
+    // pH: 6.8, 7.8, 7.6, 7.9, 8.4...
+    // Turb: 2.1, 2.5, 2.4, 1.9, 2.9...
+    // TDS: 285, 278, 235, 185, 290, 226, 237...
+    const idx      = i % DUMMY_PH.length
+    const idxTds   = i % DUMMY_TDS.length
+    const idxTurb  = i % DUMMY_TURB.length
 
-    const phVal    = isLatest ? basePh   : DUMMY_PH[idx]
-    const tdsVal   = isLatest ? baseTds  : DUMMY_TDS[idxTds]
-    const turbVal  = isLatest ? baseTurb : DUMMY_TURB[idxTurb]
+    const phVal    = DUMMY_PH[idx]
+    const tdsVal   = DUMMY_TDS[idxTds]
+    const turbVal  = DUMMY_TURB[idxTurb]
     const flowVal  = parseFloat(clamp(baseFlow + seededNoise(i * 4, 0.2), 0, 30).toFixed(2))
     const pressVal = parseFloat(clamp(basePressure + seededNoise(i * 1.5, 0.05), 0, 10).toFixed(3))
 

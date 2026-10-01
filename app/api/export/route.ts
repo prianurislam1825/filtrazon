@@ -40,7 +40,7 @@ export async function GET(request: NextRequest): Promise<Response> {
     }
   } else {
     const { generateMockHistory } = await import('@/lib/mock/telemetry')
-    let mock = generateMockHistory(500, 5000) as unknown as Record<string, unknown>[]
+    let mock = (await generateMockHistory(500, 5000)) as unknown as Record<string, unknown>[]
     if (deviceId) mock = mock.filter(r => r.device_id === deviceId)
     if (from)     mock = mock.filter(r => (r.received_at as string) >= from)
     if (to)       mock = mock.filter(r => (r.received_at as string) <= to)
