@@ -116,12 +116,16 @@ export async function generateMockHistory(
   let basePh   = DUMMY_PH[0]
   let baseTds  = DUMMY_TDS[0]
   let baseTurb = DUMMY_TURB[0]
-  let baseFlow = 3.5
+  let baseFlow = 0
   let baseBat  = 85, baseRssi = -75, baseSnr = 8.0
   let basePressure = 0.44
+  let basePump = false
+  let baseUv   = false
+  let baseRelay1 = false
+  let baseRelay2 = false
 
   try {
-    const { fetchFirebaseLatest } = await import('@/lib/firebase/client')
+    const { fetchFirebaseLatest, normalizeBool } = await import('@/lib/firebase/client')
     const fb = await fetchFirebaseLatest()
     if (fb.ok && fb.data) {
       basePh       = fb.data.ph       ?? basePh
@@ -132,6 +136,10 @@ export async function generateMockHistory(
       baseRssi     = fb.data.rssi      ?? baseRssi
       baseSnr      = fb.data.snr       ?? baseSnr
       basePressure = fb.data.pressure_v ?? basePressure
+      basePump     = normalizeBool(fb.data.pump_status)
+      baseUv       = normalizeBool(fb.data.uv_status)
+      baseRelay1   = normalizeBool(fb.data.relay1)
+      baseRelay2   = normalizeBool(fb.data.relay2)
     }
   } catch {}
 
@@ -152,7 +160,7 @@ export async function generateMockHistory(
     const phVal    = DUMMY_PH[idx]
     const tdsVal   = DUMMY_TDS[idxTds]
     const turbVal  = DUMMY_TURB[idxTurb]
-    const flowVal  = parseFloat(clamp(baseFlow + seededNoise(i * 4, 0.2), 0, 30).toFixed(2))
+    const flowVal  = basePump ? parseFloat(clamp(baseFlow + seededNoise(i * 4, 0.2), 0, 30).toFixed(2)) : 0
     const pressVal = parseFloat(clamp(basePressure + seededNoise(i * 1.5, 0.05), 0, 10).toFixed(3))
 
     readings.push({
@@ -166,10 +174,10 @@ export async function generateMockHistory(
       flow_lpm:     flowVal,
       pressure_v:   pressVal,
       total_liters: parseFloat((1200 + seq * 0.12).toFixed(1)),
-      pump_status:  true,
-      uv_status:    true,
-      relay1:       true,
-      relay2:       true,
+      pump_status:  basePump,
+      uv_status:    baseUv,
+      relay1:       baseRelay1,
+      relay2:       baseRelay2,
       relay3:       false,
       relay4:       false,
       flags:        0,
@@ -293,13 +301,13 @@ export const MOCK_LATEST_READING: Reading = {
   ph:            7.6,
   tds:           235,
   turbidity:     2.1,
-  flow_lpm:      2.8,
+  flow_lpm:      0,
   pressure_v:    0.44,
   total_liters:  1284.4,
-  pump_status:   true,
-  uv_status:     true,
-  relay1:        true,
-  relay2:        true,
+  pump_status:   false,
+  uv_status:     false,
+  relay1:        false,
+  relay2:        false,
   relay3:        false,
   relay4:        false,
   flags:         0,
