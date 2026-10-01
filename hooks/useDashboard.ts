@@ -41,17 +41,68 @@ export function useDashboard() {
   useEffect(() => { chartMetricRef.current = chartMetric }, [chartMetric])
   useEffect(() => { chartRangeRef.current  = chartRange  }, [chartRange])
 
-  // ── Fetch initial latest ───────────────────────────────
+  // ── Fetch initial data from /api/history (so Dashboard exactly mirrors Riwayat) ──
   useEffect(() => {
-    fetch('/api/latest')
+    fetch('/api/history?limit=10')
       .then(r => r.json())
       .then(data => {
-        if (data.ok && data.data) {
-          const r: Reading = data.data
-          setLatestReading(r)
-          recentRef.current = [r]
-          setRecentReadings([r])
-          setConnectionStatus(evaluateConnectionStatus(r.received_at))
+        if (data.ok && Array.isArray(data.data) && data.data.length > 0) {
+          const topRow = data.data[0]
+          const reading: Reading = {
+            id:           topRow.id,
+            device_id:    topRow.device_id,
+            seq:          topRow.seq,
+            uptime_ms:    48_000_000 + topRow.seq * 5000,
+            ph:           topRow.ph,
+            tds:          topRow.tds,
+            turbidity:    topRow.turbidity,
+            flow_lpm:     topRow.flow_lpm,
+            pressure_v:   topRow.pressure_v ?? 0.44,
+            total_liters: topRow.total_liters,
+            pump_status:  topRow.pump_status,
+            uv_status:    topRow.uv_status,
+            relay1:       topRow.pump_status,
+            relay2:       topRow.uv_status,
+            relay3:       false,
+            relay4:       false,
+            flags:        0,
+            battery:      87,
+            rssi:         topRow.rssi ?? -75,
+            snr:          topRow.snr ?? 8.0,
+            gateway_id:   topRow.gateway_id ?? 'GW-01',
+            gateway:      topRow.gateway_id ?? 'GW-01',
+            rx_ms:        new Date(topRow.received_at).getTime(),
+            received_at:  topRow.received_at,
+          }
+          setLatestReading(reading)
+          recentRef.current = data.data.map((row: any) => ({
+            id:           row.id,
+            device_id:    row.device_id,
+            seq:          row.seq,
+            uptime_ms:    48_000_000 + row.seq * 5000,
+            ph:           row.ph,
+            tds:          row.tds,
+            turbidity:    row.turbidity,
+            flow_lpm:     row.flow_lpm,
+            pressure_v:   row.pressure_v ?? 0.44,
+            total_liters: row.total_liters,
+            pump_status:  row.pump_status,
+            uv_status:    row.uv_status,
+            relay1:       row.pump_status,
+            relay2:       row.uv_status,
+            relay3:       false,
+            relay4:       false,
+            flags:        0,
+            battery:      87,
+            rssi:         row.rssi ?? -75,
+            snr:          row.snr ?? 8.0,
+            gateway_id:   row.gateway_id ?? 'GW-01',
+            gateway:      row.gateway_id ?? 'GW-01',
+            rx_ms:        new Date(row.received_at).getTime(),
+            received_at:  row.received_at,
+          }))
+          setRecentReadings([...recentRef.current])
+          setConnectionStatus(evaluateConnectionStatus(reading.received_at))
         }
       })
       .catch(() => {})
@@ -137,6 +188,7 @@ export function useDashboard() {
         tds:          fb.tds,
         turbidity:    fb.turbidity,
         flow_lpm:     fb.flow_lpm,
+        pressure_v:   fb.pressure_v,
         total_liters: fb.total_liters,
         pump_status:  fb.pump_status,
         uv_status:    fb.uv_status,
