@@ -112,7 +112,7 @@ function PhotoCard({
   member: Member; lang: 'id' | 'en'; large?: boolean
 }) {
   const { name, title, role, photo, color, wa, ig, email, leader } = member
-  const height = large ? 'h-[480px]' : 'h-[380px]'
+  const height = large ? 'h-[560px]' : 'h-[460px]'
 
   return (
     <div className={`relative w-full ${height} rounded-3xl overflow-hidden shadow-lg group hover:shadow-2xl transition-all duration-300`}>
@@ -143,11 +143,11 @@ function PhotoCard({
         </span>
       </div>
 
-      {/* Gradient overlay — bottom half */}
+      {/* Gradient overlay — stronger to keep text readable */}
       <div
         className="absolute inset-0 z-10"
         style={{
-          background: 'linear-gradient(to top, rgba(15,23,42,0.95) 0%, rgba(15,23,42,0.7) 35%, rgba(15,23,42,0.1) 60%, transparent 100%)',
+          background: 'linear-gradient(to top, rgba(15,23,42,0.97) 0%, rgba(15,23,42,0.85) 40%, rgba(15,23,42,0.2) 65%, transparent 100%)',
         }}
       />
 
@@ -156,9 +156,12 @@ function PhotoCard({
         <p className="text-[11px] font-semibold mb-0.5" style={{ color }}>
           {role[lang]}
         </p>
-        <h3 className={`font-black text-white leading-tight mb-3 ${large ? 'text-xl' : 'text-base'}`}>
+        <h3 className={`font-black text-white leading-tight mb-2 ${large ? 'text-xl' : 'text-base'}`}>
           {name}
         </h3>
+        <p className={`text-white/70 leading-relaxed mb-3 ${large ? 'text-xs' : 'text-[11px] line-clamp-3'}`}>
+          {member.desc[lang]}
+        </p>
         <SocialLinks wa={wa} ig={ig} email={email} />
       </div>
 
