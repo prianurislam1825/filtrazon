@@ -16,7 +16,7 @@ const TEAM = [
       id: 'Memimpin visi dan strategi FILTRAZON secara keseluruhan, mengorkestrasi seluruh tim serta mengarahkan inovasi dari tahap konsep hingga implementasi lapangan nyata.',
       en: 'Leads the overall vision and strategy of FILTRAZON, orchestrating the entire team and driving innovation from concept to real-world field implementation.',
     },
-    photo:  null as string | null,  // ganti dengan '/team/haikal.jpg' setelah foto ditambah
+    photo:  '/team/haikal.jpg',
     leader: true,
     color:  '#D4A017',
     wa:     'https://wa.me/6281226615585',
@@ -32,7 +32,7 @@ const TEAM = [
       id: 'Memimpin riset dan inovasi teknologi FILTRAZON, mengeksplorasi solusi mutakhir untuk meningkatkan filtrasi dan solusi yang dibutuhkan bagi korban bencana.',
       en: 'Leads research and technology innovation at FILTRAZON, exploring cutting-edge solutions to improve filtration for disaster victims.',
     },
-    photo:  null as string | null,
+    photo:  '/team/kania.jpg',
     leader: false,
     color:  '#2196D3',
     wa:     'https://wa.me/6281297011820',
@@ -48,7 +48,7 @@ const TEAM = [
       id: 'Merancang dan mengeksekusi strategi pemasaran FILTRAZON, membangun brand awareness dan jejaring kolaborasi, serta memperluas jangkauan pasar secara nasional.',
       en: 'Designs and executes marketing strategy, builds brand awareness and collaboration networks, and expands national market reach.',
     },
-    photo:  null as string | null,
+    photo:  '/team/elfira.jpg',
     leader: false,
     color:  '#43A047',
     wa:     'https://wa.me/628122988261',
@@ -64,7 +64,7 @@ const TEAM = [
       id: 'Bertanggung jawab atas pengembangan produk secara end-to-end, memastikan FILTRAZON memenuhi standar kualitas lingkungan dan kebutuhan pengguna.',
       en: 'Responsible for end-to-end product development, ensuring FILTRAZON meets environmental quality standards and user needs.',
     },
-    photo:  null as string | null,
+    photo:  '/team/aisyah.jpg',
     leader: false,
     color:  '#D4A017',
     wa:     'https://wa.me/6282324765512',
@@ -80,7 +80,7 @@ const TEAM = [
       id: 'Memimpin pengembangan teknologi dan infrastruktur digital, termasuk sistem kontrol berbasis IoT serta arsitektur perangkat lunak FILTRAZON.',
       en: 'Leads technology development and digital infrastructure, including IoT-based control systems and FILTRAZON software architecture.',
     },
-    photo:  null as string | null,
+    photo:  '/team/fattah.jpg',
     leader: false,
     color:  '#2196D3',
     wa:     'https://wa.me/6281326354819',
@@ -176,12 +176,6 @@ export default function TeamSection() {
             {lang === 'id'
               ? 'Tim muda yang berdedikasi menghadirkan solusi air bersih berbasis teknologi untuk masyarakat terdampak bencana.'
               : 'A dedicated young team delivering technology-based clean water solutions for disaster-affected communities.'}
-          </p>
-          {/* Photo hint */}
-          <p className="mt-2 text-[11px] text-gray-400 italic">
-            {lang === 'id'
-              ? '* Foto tim akan ditampilkan setelah file diunggah ke /public/team/'
-              : '* Team photos will appear after files are uploaded to /public/team/'}
           </p>
         </div>
 
