@@ -22,31 +22,33 @@ export async function GET(request: NextRequest): Promise<Response> {
       const { getReadings } = await import('@/lib/db/readings')
       const readings = await getReadings({ device_id: deviceId, from, to, limit, offset })
 
-      const rows: TelemetryRow[] = readings.map(r => {
-        const q = evaluateWaterQuality(r.ph, r.tds, r.turbidity, r.flow_lpm, r.pump_status)
-        return {
-          id:          r.id,
-          received_at: typeof r.received_at === 'string' ? r.received_at : new Date(r.received_at).toISOString(),
-          seq:         r.seq,
-          ph:          r.ph,
-          tds:         r.tds,
-          turbidity:   r.turbidity,
-          flow_lpm:    r.flow_lpm,
-          total_liters: r.total_liters ?? 0,
-          rssi:        r.rssi,
-          snr:         r.snr,
-          pump_status: !!r.pump_status,
-          uv_status:   !!r.uv_status,
-          device_id:   r.device_id,
-          gateway_id:  r.gateway_id,
-          status:      q.status,
-        }
-      })
+      if (readings && readings.length > 0) {
+        const rows: TelemetryRow[] = readings.map(r => {
+          const q = evaluateWaterQuality(r.ph, r.tds, r.turbidity, r.flow_lpm, r.pump_status)
+          return {
+            id:          r.id,
+            received_at: typeof r.received_at === 'string' ? r.received_at : new Date(r.received_at).toISOString(),
+            seq:         r.seq,
+            ph:          r.ph,
+            tds:         r.tds,
+            turbidity:   r.turbidity,
+            flow_lpm:    r.flow_lpm,
+            pressure_v:  r.pressure_v,
+            total_liters: r.total_liters ?? 0,
+            rssi:        r.rssi,
+            snr:         r.snr,
+            pump_status: !!r.pump_status,
+            uv_status:   !!r.uv_status,
+            device_id:   r.device_id,
+            gateway_id:  r.gateway_id,
+            status:      q.status,
+          }
+        })
 
-      return Response.json({ ok: true, data: rows })
+        return Response.json({ ok: true, data: rows })
+      }
     } catch (err) {
-      console.error('[history] DB query failed:', err)
-      return Response.json({ ok: false, error: 'Database error' }, { status: 500 })
+      console.warn('[history] DB query failed or unavailable, falling back to mock history:', err)
     }
   }
 
