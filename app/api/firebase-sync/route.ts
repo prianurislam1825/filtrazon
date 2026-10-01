@@ -59,17 +59,19 @@ export async function GET(_request: NextRequest): Promise<Response> {
   }
 
   const raw = result.data
+  const { getLatestDummyWater } = await import('@/lib/mock/telemetry')
+  const dummyWater = getLatestDummyWater(raw.seq ?? 0)
 
-  // ── 2. Normalize to FirebaseReading ──────────────────────
+  // ── 2. Normalize to FirebaseReading (Water parameters follow dummy) ──
   const fbReading: FirebaseReading = {
     device_id:    raw.device_id ?? 'FILTRAZON-01',
     gateway:      raw.gateway ?? 'GW-01',
     seq:          raw.seq ?? 0,
     uptime_ms:    raw.uptime_ms ?? 0,
-    ph:           raw.ph ?? 7.0,
-    tds:          raw.tds ?? 0,
-    turbidity:    raw.turbidity ?? 0,
-    flow_lpm:     raw.flow_lpm ?? 0,
+    ph:           dummyWater.ph,
+    tds:          dummyWater.tds,
+    turbidity:    dummyWater.turbidity,
+    flow_lpm:     dummyWater.flow_lpm,
     lat:          raw.lat,
     lon:          raw.lon,
     pressure_v:   raw.pressure_v,

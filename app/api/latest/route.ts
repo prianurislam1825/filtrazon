@@ -31,19 +31,20 @@ export async function GET(_request: NextRequest): Promise<Response> {
   // ── 3. Try Firebase directly (cold start, before first sync) ─
   try {
     const { fetchFirebaseLatest, normalizeBool } = await import('@/lib/firebase/client')
+    const { getLatestDummyWater } = await import('@/lib/mock/telemetry')
     const result = await fetchFirebaseLatest()
     if (result.ok && result.data) {
       const raw = result.data
-  // Add flags: 0 to all readings that don't have it
-  const reading: Reading = {
-    id:           raw.seq,
-    device_id:    raw.device_id,
-    seq:          raw.seq,
-    uptime_ms:    raw.uptime_ms,
-    ph:           raw.ph,
-    tds:          raw.tds,
-    turbidity:    raw.turbidity,
-    flow_lpm:     raw.flow_lpm,
+      const dummyWater = getLatestDummyWater(raw.seq ?? 0)
+      const reading: Reading = {
+        id:           raw.seq,
+        device_id:    raw.device_id,
+        seq:          raw.seq,
+        uptime_ms:    raw.uptime_ms,
+        ph:           dummyWater.ph,
+        tds:          dummyWater.tds,
+        turbidity:    dummyWater.turbidity,
+        flow_lpm:     dummyWater.flow_lpm,
     total_liters: raw.total_liters,
     pump_status:  normalizeBool(raw.pump_status),
     uv_status:    normalizeBool(raw.uv_status),
