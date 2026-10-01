@@ -88,18 +88,18 @@ type Member = typeof TEAM[number]
 // ── Social links ───────────────────────────────────────────────
 function SocialLinks({ wa, ig, email }: { wa: string; ig: string; email: string }) {
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center justify-center gap-2.5">
       <a href={wa} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"
-        className="w-8 h-8 rounded-xl bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center text-white hover:bg-white/40 transition-colors">
-        <MessageCircle size={14} />
+        className="w-8 h-8 rounded-xl bg-[#0077B6]/30 hover:bg-[#0077B6]/70 backdrop-blur-md border border-[#00B4D8]/40 flex items-center justify-center text-[#90E0EF] hover:text-white transition-all shadow-sm">
+        <MessageCircle size={15} />
       </a>
       <a href={ig} target="_blank" rel="noopener noreferrer" aria-label="Instagram"
-        className="w-8 h-8 rounded-xl bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center text-white hover:bg-white/40 transition-colors">
-        <Instagram size={14} />
+        className="w-8 h-8 rounded-xl bg-[#0077B6]/30 hover:bg-[#0077B6]/70 backdrop-blur-md border border-[#00B4D8]/40 flex items-center justify-center text-[#90E0EF] hover:text-white transition-all shadow-sm">
+        <Instagram size={15} />
       </a>
       <a href={`mailto:${email}`} aria-label="Email"
-        className="w-8 h-8 rounded-xl bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center text-white hover:bg-white/40 transition-colors">
-        <Mail size={14} />
+        className="w-8 h-8 rounded-xl bg-[#0077B6]/30 hover:bg-[#0077B6]/70 backdrop-blur-md border border-[#00B4D8]/40 flex items-center justify-center text-[#90E0EF] hover:text-white transition-all shadow-sm">
+        <Mail size={15} />
       </a>
     </div>
   )
@@ -133,10 +133,10 @@ function PhotoCard({
         />
       )}
 
-      {/* Top badge */}
-      <div className="absolute top-3 left-3 z-10">
+      {/* Top badge — centered */}
+      <div className="absolute top-3 inset-x-0 flex justify-center z-10">
         <span
-          className="text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full"
+          className="text-[10px] font-black uppercase tracking-wider px-3.5 py-1 rounded-full shadow-md backdrop-blur-sm"
           style={{ background: color, color: '#fff' }}
         >
           {title}{leader ? ` · ${lang === 'id' ? 'Ketua Tim' : 'Leader'}` : ''}
@@ -151,15 +151,15 @@ function PhotoCard({
         }}
       />
 
-      {/* Info overlay — bottom */}
-      <div className="absolute bottom-0 left-0 right-0 z-20 p-5">
-        <p className="text-[11px] font-semibold mb-0.5" style={{ color }}>
+      {/* Info overlay — bottom & centered */}
+      <div className="absolute bottom-0 left-0 right-0 z-20 p-5 text-center flex flex-col items-center">
+        <p className="text-[11px] font-semibold mb-0.5 tracking-wide" style={{ color }}>
           {role[lang]}
         </p>
         <h3 className={`font-black text-white leading-tight mb-2 ${large ? 'text-xl' : 'text-base'}`}>
           {name}
         </h3>
-        <p className={`text-white/70 leading-relaxed mb-3 ${large ? 'text-xs' : 'text-[11px] line-clamp-3'}`}>
+        <p className={`text-white/75 leading-relaxed mb-3.5 max-w-[280px] ${large ? 'text-xs' : 'text-[11px] line-clamp-3'}`}>
           {member.desc[lang]}
         </p>
         <SocialLinks wa={wa} ig={ig} email={email} />
