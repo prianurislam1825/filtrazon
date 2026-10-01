@@ -147,21 +147,42 @@ export async function generateMockHistory(
     const ts       = new Date(now - i * intervalMs).toISOString()
     const seq      = 12548 - i
 
-    // Data index dihitung dari yang paling baru (i = 0) ke yang lampau
-    // Sehingga saat di-reverse untuk tabel (terbaru di atas), baris 1, 2, 3...
-    // langsung berurutan menampilkan nilai dummy:
-    // pH: 6.8, 7.8, 7.6, 7.9, 8.4...
-    // Turb: 2.1, 2.5, 2.4, 1.9, 2.9...
-    // TDS: 285, 278, 235, 185, 290, 226, 237...
-    const idx      = i % DUMMY_PH.length
-    const idxTds   = i % DUMMY_TDS.length
-    const idxTurb  = i % DUMMY_TURB.length
+    // 7 baris teratas (i = 0 s.d. 6): Murni nilai dummy yang diminta user (Semua Aman)
+    // Baris-baris sebelumnya (i >= 7): Data historis variasi alami seperti semula (kebanyakan aman, sesekali waspada)
+    let phVal: number
+    let tdsVal: number
+    let turbVal: number
+    let flowVal: number
+    let pressVal: number
+    let pumpStatus: boolean
+    let uvStatus: boolean
+    let r1: boolean
+    let r2: boolean
 
-    const phVal    = DUMMY_PH[idx]
-    const tdsVal   = DUMMY_TDS[idxTds]
-    const turbVal  = DUMMY_TURB[idxTurb]
-    const flowVal  = basePump ? parseFloat(clamp(baseFlow + seededNoise(i * 4, 0.2), 0, 30).toFixed(2)) : 0
-    const pressVal = parseFloat(clamp(basePressure + seededNoise(i * 1.5, 0.05), 0, 10).toFixed(3))
+    if (i < 7) {
+      // Baris dummy aman sesuai permintaan
+      phVal      = DUMMY_PH[i % DUMMY_PH.length]
+      tdsVal     = DUMMY_TDS[i % DUMMY_TDS.length]
+      turbVal    = DUMMY_TURB[i % DUMMY_TURB.length]
+      flowVal    = basePump ? parseFloat(clamp(baseFlow + seededNoise(i * 4, 0.2), 0, 30).toFixed(2)) : 0
+      pressVal   = parseFloat(clamp(basePressure + seededNoise(i * 1.5, 0.05), 0, 10).toFixed(3))
+      pumpStatus = basePump
+      uvStatus   = baseUv
+      r1         = baseRelay1
+      r2         = baseRelay2
+    } else {
+      // Data sebelumnya: pola historis alami
+      const scenario = getScenario(seq)
+      phVal      = parseFloat(clamp(scenario.ph + seededNoise(seq, 0.1), 0, 14).toFixed(2))
+      tdsVal     = parseFloat(clamp(scenario.tds + seededNoise(seq * 2, 10), 0, 2000).toFixed(0))
+      turbVal    = parseFloat(clamp(scenario.turbidity + seededNoise(seq * 3, 5), 0, 3000).toFixed(1))
+      flowVal    = scenario.flow_lpm
+      pressVal   = parseFloat(clamp(basePressure + seededNoise(i * 1.5, 0.05), 0, 10).toFixed(3))
+      pumpStatus = scenario.pump_status
+      uvStatus   = scenario.uv_status
+      r1         = scenario.pump_status
+      r2         = scenario.uv_status
+    }
 
     readings.push({
       id:           seq,
@@ -174,10 +195,10 @@ export async function generateMockHistory(
       flow_lpm:     flowVal,
       pressure_v:   pressVal,
       total_liters: parseFloat((1200 + seq * 0.12).toFixed(1)),
-      pump_status:  basePump,
-      uv_status:    baseUv,
-      relay1:       baseRelay1,
-      relay2:       baseRelay2,
+      pump_status:  pumpStatus,
+      uv_status:    uvStatus,
+      relay1:       r1,
+      relay2:       r2,
       relay3:       false,
       relay4:       false,
       flags:        0,
