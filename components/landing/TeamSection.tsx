@@ -199,11 +199,20 @@ export default function TeamSection() {
           </p>
         </div>
 
-        {/* ── Leader — centered, taller ── */}
-        <div className="flex justify-center mb-6">
-          <div className="w-full max-w-xs">
+        {/* ── Leader — centered, prominent ── */}
+        <div className="flex justify-center mb-8">
+          <div className="w-full max-w-sm">
             <PhotoCard member={leader} lang={lang} large />
           </div>
+        </div>
+
+        {/* Divider */}
+        <div className="flex items-center gap-4 mb-6">
+          <div className="flex-1 h-px bg-gray-200" />
+          <span className="text-xs font-bold uppercase tracking-widest text-gray-400">
+            {lang === 'id' ? 'Anggota Tim' : 'Team Members'}
+          </span>
+          <div className="flex-1 h-px bg-gray-200" />
         </div>
 
         {/* ── Members grid — 2 col mobile, 4 col desktop ── */}
