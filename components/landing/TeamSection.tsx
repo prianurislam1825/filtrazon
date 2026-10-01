@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { Instagram, MessageCircle, Mail } from 'lucide-react'
 import { useLang } from '@/lib/i18n/context'
 
+// ── Team data ─────────────────────────────────────────────────
 const TEAM = [
   {
     name:   'Haikal Adz Dzaki',
@@ -84,138 +85,133 @@ const TEAM = [
 
 type Member = typeof TEAM[number]
 
-function Socials({ wa, ig, email }: { wa: string; ig: string; email: string }) {
-  const btn = 'w-8 h-8 rounded-full bg-white/15 border border-white/25 flex items-center justify-center text-white/80 hover:bg-white/30 hover:text-white transition-all'
+// ── Social links ───────────────────────────────────────────────
+function SocialLinks({ wa, ig, email }: { wa: string; ig: string; email: string }) {
   return (
-    <div className="flex gap-2">
-      <a href={wa} target="_blank" rel="noopener noreferrer" aria-label="WA" className={btn}><MessageCircle size={13} /></a>
-      <a href={ig} target="_blank" rel="noopener noreferrer" aria-label="IG" className={btn}><Instagram size={13} /></a>
-      <a href={`mailto:${email}`} aria-label="Email" className={btn}><Mail size={13} /></a>
+    <div className="flex items-center gap-2">
+      <a href={wa} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"
+        className="w-8 h-8 rounded-xl bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center text-white hover:bg-white/40 transition-colors">
+        <MessageCircle size={14} />
+      </a>
+      <a href={ig} target="_blank" rel="noopener noreferrer" aria-label="Instagram"
+        className="w-8 h-8 rounded-xl bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center text-white hover:bg-white/40 transition-colors">
+        <Instagram size={14} />
+      </a>
+      <a href={`mailto:${email}`} aria-label="Email"
+        className="w-8 h-8 rounded-xl bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center text-white hover:bg-white/40 transition-colors">
+        <Mail size={14} />
+      </a>
     </div>
   )
 }
 
-// ── Large featured card (CEO) ─────────────────────────────────
-function LeaderCard({ m, lang }: { m: Member; lang: 'id' | 'en' }) {
+// ── Photo Card (foto = background, info overlay bawah) ─────────
+function PhotoCard({
+  member, lang, large = false,
+}: {
+  member: Member; lang: 'id' | 'en'; large?: boolean
+}) {
+  const { name, title, role, photo, color, wa, ig, email, leader } = member
+  const height = large ? 'h-[560px]' : 'h-[460px]'
+
   return (
-    <div className="relative h-full min-h-[500px] rounded-2xl overflow-hidden group">
-      {m.photo && (
-        <Image src={m.photo} alt={m.name} fill
-          className="object-cover object-top group-hover:scale-105 transition-transform duration-700"
-          sizes="(max-width: 768px) 100vw, 40vw" priority />
+    <div className={`relative w-full ${height} rounded-3xl overflow-hidden shadow-lg group hover:shadow-2xl transition-all duration-300`}>
+
+      {/* Photo — fills entire card */}
+      {photo ? (
+        <Image
+          src={photo}
+          alt={name}
+          fill
+          className="object-cover object-top"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+        />
+      ) : (
+        <div
+          className="absolute inset-0"
+          style={{ background: `linear-gradient(135deg, ${color}30, ${color}60)` }}
+        />
       )}
-      {/* gradient */}
-      <div className="absolute inset-0"
-        style={{ background: 'linear-gradient(160deg, transparent 30%, rgba(10,15,30,0.97) 100%)' }} />
 
-      {/* Top accent line */}
-      <div className="absolute top-0 left-0 right-0 h-1 rounded-t-2xl" style={{ background: m.color }} />
-
-      {/* Content */}
-      <div className="absolute bottom-0 left-0 right-0 p-6">
-        {/* Badge */}
-        <span className="inline-block text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full mb-4"
-          style={{ background: `${m.color}25`, color: m.color, border: `1px solid ${m.color}50` }}>
-          {m.title} &nbsp;·&nbsp; {lang === 'id' ? 'Ketua Tim' : 'Team Leader'}
-        </span>
-        <h3 className="text-2xl font-black text-white leading-tight mb-1">{m.name}</h3>
-        <p className="text-sm font-semibold mb-3" style={{ color: m.color }}>{m.role[lang]}</p>
-        <p className="text-white/60 text-xs leading-relaxed mb-5">{m.desc[lang]}</p>
-        <Socials wa={m.wa} ig={m.ig} email={m.email} />
-      </div>
-    </div>
-  )
-}
-
-// ── Small member card ─────────────────────────────────────────
-function MemberCard({ m, lang }: { m: Member; lang: 'id' | 'en' }) {
-  return (
-    <div className="relative rounded-2xl overflow-hidden group h-[240px]">
-      {m.photo && (
-        <Image src={m.photo} alt={m.name} fill
-          className="object-cover object-top group-hover:scale-105 transition-transform duration-700"
-          sizes="(max-width: 768px) 50vw, 30vw" />
-      )}
-      {/* gradient */}
-      <div className="absolute inset-0"
-        style={{ background: 'linear-gradient(to top, rgba(10,15,30,0.95) 0%, rgba(10,15,30,0.6) 45%, transparent 75%)' }} />
-
-      {/* Top accent */}
-      <div className="absolute top-0 left-0 right-0 h-[3px]" style={{ background: m.color }} />
-
-      {/* Badge */}
+      {/* Top badge */}
       <div className="absolute top-3 left-3 z-10">
-        <span className="text-[9px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full"
-          style={{ background: m.color, color: '#fff' }}>{m.title}</span>
+        <span
+          className="text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full"
+          style={{ background: color, color: '#fff' }}
+        >
+          {title}{leader ? ` · ${lang === 'id' ? 'Ketua Tim' : 'Leader'}` : ''}
+        </span>
       </div>
 
-      {/* Info */}
-      <div className="absolute bottom-0 left-0 right-0 p-3">
-        <p className="text-[9px] font-bold uppercase tracking-wider mb-0.5" style={{ color: m.color }}>
-          {m.role[lang]}
+      {/* Gradient overlay — stronger to keep text readable */}
+      <div
+        className="absolute inset-0 z-10"
+        style={{
+          background: 'linear-gradient(to top, rgba(15,23,42,0.97) 0%, rgba(15,23,42,0.85) 40%, rgba(15,23,42,0.2) 65%, transparent 100%)',
+        }}
+      />
+
+      {/* Info overlay — bottom */}
+      <div className="absolute bottom-0 left-0 right-0 z-20 p-5">
+        <p className="text-[11px] font-semibold mb-0.5" style={{ color }}>
+          {role[lang]}
         </p>
-        <p className="text-white text-xs font-black leading-tight mb-2">{m.name}</p>
-        <Socials wa={m.wa} ig={m.ig} email={m.email} />
+        <h3 className={`font-black text-white leading-tight mb-2 ${large ? 'text-xl' : 'text-base'}`}>
+          {name}
+        </h3>
+        <p className={`text-white/70 leading-relaxed mb-3 ${large ? 'text-xs' : 'text-[11px] line-clamp-3'}`}>
+          {member.desc[lang]}
+        </p>
+        <SocialLinks wa={wa} ig={ig} email={email} />
       </div>
+
+      {/* Online dot for leader */}
+      {leader && (
+        <span className="absolute bottom-4 right-4 z-20 w-4 h-4 rounded-full bg-green-500 border-2 border-white shadow flex items-center justify-center">
+          <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+        </span>
+      )}
     </div>
   )
 }
 
+// ── Main section ───────────────────────────────────────────────
 export default function TeamSection() {
   const { lang } = useLang()
   const [leader, ...members] = TEAM
 
   return (
-    <section id="tim" className="py-20 bg-[#0C1220]">
+    <section id="tim" className="py-16 sm:py-20 bg-gray-50">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
 
         {/* Heading */}
-        <div className="mb-12">
+        <div className="text-center mb-10 sm:mb-14">
           <p className="text-xs font-bold uppercase tracking-widest text-[#D4A017] mb-3">
             {lang === 'id' ? 'Tim Kami' : 'Our Team'}
           </p>
-          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-            <h2 className="text-3xl sm:text-4xl font-black text-white leading-tight max-w-sm">
-              {lang === 'id' ? 'Orang-orang di Balik FILTRAZON' : 'The People Behind FILTRAZON'}
-            </h2>
-            <p className="text-white/50 text-sm max-w-xs leading-relaxed">
-              {lang === 'id'
-                ? 'Tim muda yang berdedikasi menghadirkan solusi air bersih berbasis teknologi.'
-                : 'A dedicated young team delivering technology-based clean water solutions.'}
-            </p>
-          </div>
-          {/* Divider */}
-          <div className="mt-6 flex items-center gap-3">
-            <div className="h-px flex-1 bg-white/10" />
-            <div className="flex gap-1.5">
-              {TEAM.map((m) => (
-                <div key={m.title} className="w-2 h-2 rounded-full" style={{ background: m.color }} />
-              ))}
-            </div>
-            <div className="h-px flex-1 bg-white/10" />
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-[#1C2B3A] leading-tight">
+            {lang === 'id' ? 'Orang-orang di Balik FILTRAZON' : 'The People Behind FILTRAZON'}
+          </h2>
+          <p className="mt-3 text-gray-500 text-sm max-w-md mx-auto leading-relaxed">
+            {lang === 'id'
+              ? 'Tim muda yang berdedikasi menghadirkan solusi air bersih berbasis teknologi untuk masyarakat terdampak bencana.'
+              : 'A dedicated young team delivering technology-based clean water solutions for disaster-affected communities.'}
+          </p>
+        </div>
+
+        {/* ── Leader — centered, taller ── */}
+        <div className="flex justify-center mb-6">
+          <div className="w-full max-w-xs">
+            <PhotoCard member={leader} lang={lang} large />
           </div>
         </div>
 
-        {/* ── Main layout: CEO left tall + 2×2 grid right ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
-
-          {/* CEO — spans 2 cols, full height */}
-          <div className="lg:col-span-2 lg:row-span-2">
-            <LeaderCard m={leader} lang={lang} />
-          </div>
-
-          {/* 4 members — 2 cols × 2 rows */}
+        {/* ── Members grid — 2 col mobile, 4 col desktop ── */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {members.map((m, i) => (
-            <div key={i} className="lg:col-span-3" style={{ gridColumn: 'span 1' }}>
-              <MemberCard m={m} lang={lang} />
-            </div>
+            <PhotoCard key={i} member={m} lang={lang} />
           ))}
         </div>
-
-        {/* Member count */}
-        <p className="mt-8 text-center text-white/30 text-xs tracking-widest uppercase">
-          {TEAM.length} {lang === 'id' ? 'Anggota Tim · FILTRAZON 2025' : 'Team Members · FILTRAZON 2025'}
-        </p>
 
       </div>
     </section>

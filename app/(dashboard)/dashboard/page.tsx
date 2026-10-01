@@ -1,4 +1,4 @@
-'use client'
+  'use client'
 
 import { useMemo } from 'react'
 import { Droplets, Gauge, Waves, Activity, Container, WifiOff } from 'lucide-react'
