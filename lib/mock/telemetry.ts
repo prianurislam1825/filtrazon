@@ -160,16 +160,16 @@ export async function generateMockHistory(
     let r2: boolean
 
     if (i < 5) {
-      // 5 baris paling atas (terbaru): Dummy aman dengan laju alir 3 L/min
+      // 5 baris paling atas (terbaru): Dummy aman dengan laju alir 3 L/min & Pompa + UV NYALA
       phVal      = DUMMY_PH[i % DUMMY_PH.length]
       tdsVal     = DUMMY_TDS[i % DUMMY_TDS.length]
       turbVal    = DUMMY_TURB[i % DUMMY_TURB.length]
       flowVal    = parseFloat(clamp(3.0 + seededNoise(i * 4, 0.15), 2.8, 3.2).toFixed(2))
       pressVal   = parseFloat(clamp(basePressure + seededNoise(i * 1.5, 0.05), 0, 10).toFixed(3))
-      pumpStatus = basePump
-      uvStatus   = baseUv
-      r1         = baseRelay1
-      r2         = baseRelay2
+      pumpStatus = true
+      uvStatus   = true
+      r1         = true
+      r2         = true
     } else if (i % 6 === 0 || i === 5) {
       // Baris BAHAYA (Danger) rutin muncul (merah)
       phVal      = 5.40
@@ -344,13 +344,13 @@ export const MOCK_LATEST_READING: Reading = {
   ph:            7.6,
   tds:           235,
   turbidity:     2.1,
-  flow_lpm:      0,
+  flow_lpm:      3.0,
   pressure_v:    0.44,
   total_liters:  1284.4,
-  pump_status:   false,
-  uv_status:     false,
-  relay1:        false,
-  relay2:        false,
+  pump_status:   true,
+  uv_status:     true,
+  relay1:        true,
+  relay2:        true,
   relay3:        false,
   relay4:        false,
   flags:         0,
