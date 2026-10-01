@@ -160,7 +160,7 @@ export async function generateMockHistory(
     let r2: boolean
 
     if (i < 7) {
-      // Baris dummy aman sesuai permintaan
+      // 7 baris paling atas (terbaru): Murni nilai dummy yang diminta user (Semua Aman)
       phVal      = DUMMY_PH[i % DUMMY_PH.length]
       tdsVal     = DUMMY_TDS[i % DUMMY_TDS.length]
       turbVal    = DUMMY_TURB[i % DUMMY_TURB.length]
@@ -170,8 +170,30 @@ export async function generateMockHistory(
       uvStatus   = baseUv
       r1         = baseRelay1
       r2         = baseRelay2
+    } else if (i === 7) {
+      // Tepat di bawah dummy (baris ke-8): Data BAHAYA (Danger) jelas kelihatan di halaman 1!
+      phVal      = 5.40
+      tdsVal     = 520
+      turbVal    = 620.0
+      flowVal    = 0
+      pressVal   = 0.120
+      pumpStatus = true
+      uvStatus   = true
+      r1         = true
+      r2         = true
+    } else if (i === 9 || i === 13) {
+      // Data WASPADA (Warning)
+      phVal      = 6.20
+      tdsVal     = 380
+      turbVal    = 130.0
+      flowVal    = 2.10
+      pressVal   = 0.350
+      pumpStatus = true
+      uvStatus   = true
+      r1         = true
+      r2         = true
     } else {
-      // Data sebelumnya: pola historis alami
+      // Data normal lainnya
       const scenario = getScenario(seq)
       phVal      = parseFloat(clamp(scenario.ph + seededNoise(seq, 0.1), 0, 14).toFixed(2))
       tdsVal     = parseFloat(clamp(scenario.tds + seededNoise(seq * 2, 10), 0, 2000).toFixed(0))
