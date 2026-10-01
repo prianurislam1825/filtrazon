@@ -88,18 +88,31 @@ type Member = typeof TEAM[number]
 // ── Social links ───────────────────────────────────────────────
 function SocialLinks({ wa, ig, email }: { wa: string; ig: string; email: string }) {
   return (
-    <div className="flex items-center justify-center gap-2.5">
-      <a href={wa} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"
-        className="w-8 h-8 rounded-xl bg-[#0077B6]/30 hover:bg-[#0077B6]/70 backdrop-blur-md border border-[#00B4D8]/40 flex items-center justify-center text-[#90E0EF] hover:text-white transition-all shadow-sm">
-        <MessageCircle size={15} />
+    <div className="flex items-center justify-center gap-3">
+      <a
+        href={wa}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="WhatsApp"
+        className="group/btn relative w-9 h-9 rounded-xl bg-gradient-to-br from-[#0077B6]/40 to-[#0096C7]/30 hover:from-[#0077B6] hover:to-[#00B4D8] backdrop-blur-md border border-[#00B4D8]/40 hover:border-cyan-300 flex items-center justify-center text-[#90E0EF] hover:text-white transition-all duration-300 hover:scale-110 hover:-translate-y-1 hover:shadow-[0_0_15px_rgba(0,180,216,0.6)] active:scale-95"
+      >
+        <MessageCircle size={16} className="transition-transform duration-300 group-hover/btn:rotate-12 group-hover/btn:scale-110" />
       </a>
-      <a href={ig} target="_blank" rel="noopener noreferrer" aria-label="Instagram"
-        className="w-8 h-8 rounded-xl bg-[#0077B6]/30 hover:bg-[#0077B6]/70 backdrop-blur-md border border-[#00B4D8]/40 flex items-center justify-center text-[#90E0EF] hover:text-white transition-all shadow-sm">
-        <Instagram size={15} />
+      <a
+        href={ig}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Instagram"
+        className="group/btn relative w-9 h-9 rounded-xl bg-gradient-to-br from-[#0077B6]/40 to-[#0096C7]/30 hover:from-[#0077B6] hover:to-[#00B4D8] backdrop-blur-md border border-[#00B4D8]/40 hover:border-cyan-300 flex items-center justify-center text-[#90E0EF] hover:text-white transition-all duration-300 hover:scale-110 hover:-translate-y-1 hover:shadow-[0_0_15px_rgba(0,180,216,0.6)] active:scale-95"
+      >
+        <Instagram size={16} className="transition-transform duration-300 group-hover/btn:-rotate-12 group-hover/btn:scale-110" />
       </a>
-      <a href={`mailto:${email}`} aria-label="Email"
-        className="w-8 h-8 rounded-xl bg-[#0077B6]/30 hover:bg-[#0077B6]/70 backdrop-blur-md border border-[#00B4D8]/40 flex items-center justify-center text-[#90E0EF] hover:text-white transition-all shadow-sm">
-        <Mail size={15} />
+      <a
+        href={`mailto:${email}`}
+        aria-label="Email"
+        className="group/btn relative w-9 h-9 rounded-xl bg-gradient-to-br from-[#0077B6]/40 to-[#0096C7]/30 hover:from-[#0077B6] hover:to-[#00B4D8] backdrop-blur-md border border-[#00B4D8]/40 hover:border-cyan-300 flex items-center justify-center text-[#90E0EF] hover:text-white transition-all duration-300 hover:scale-110 hover:-translate-y-1 hover:shadow-[0_0_15px_rgba(0,180,216,0.6)] active:scale-95"
+      >
+        <Mail size={16} className="transition-transform duration-300 group-hover/btn:scale-110 group-hover/btn:-translate-y-0.5" />
       </a>
     </div>
   )
