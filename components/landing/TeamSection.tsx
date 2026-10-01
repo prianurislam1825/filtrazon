@@ -85,19 +85,19 @@ const TEAM = [
 
 // ── Photo cover with fallback ───────────────────────────────────
 function PhotoCover({
-  photo, name, color, height = 240,
+  photo, name, color, height = 320,
 }: {
   photo: string | null; name: string; color: string; height?: number
 }) {
   if (photo) {
     return (
-      <div className="w-full overflow-hidden" style={{ height }}>
+      <div className="w-full overflow-hidden bg-white flex items-center justify-center" style={{ height }}>
         <Image
           src={photo}
           alt={name}
           width={400}
           height={height}
-          className="w-full h-full object-cover object-top"
+          className="w-full h-full object-contain object-center"
         />
       </div>
     )
@@ -164,7 +164,7 @@ export default function TeamSection() {
           >
             {/* Big photo */}
             <div className="relative">
-              <PhotoCover photo={leader.photo} name={leader.name} color={leader.color} height={300} />
+              <PhotoCover photo={leader.photo} name={leader.name} color={leader.color} height={420} />
               {/* Leader badge */}
               <span
                 className="absolute top-3 left-3 text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full border backdrop-blur-sm"
@@ -203,7 +203,7 @@ export default function TeamSection() {
               style={{ borderColor: `${m.color}20`, borderTop: `3px solid ${m.color}` }}
             >
               {/* Big photo */}
-              <PhotoCover photo={m.photo} name={m.name} color={m.color} height={200} />
+              <PhotoCover photo={m.photo} name={m.name} color={m.color} height={300} />
 
               {/* Info */}
               <div className="p-4">
