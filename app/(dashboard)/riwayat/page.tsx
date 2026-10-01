@@ -346,7 +346,7 @@ export default function RiwayatPage() {
             <SummaryCard label={lang === 'id' ? 'Avg Kekeruhan' : 'Avg Turbidity'} value={avgTurb.toFixed(0)} unit="NTU"
               status={evaluateTurbidity(avgTurb).status as 'safe' | 'warning' | 'danger'} />
             <SummaryCard label={lang === 'id' ? 'Avg Laju Alir' : 'Avg Flow Rate'} value={avgFlow.toFixed(2)} unit="L/min"
-              status={evaluateFlow(avgFlow, true).status as 'safe' | 'warning' | 'danger'} />
+              status={evaluateFlow(avgFlow, rows.some(r => r.pump_status)).status as 'safe' | 'warning' | 'danger'} />
           </div>
         )}
 
