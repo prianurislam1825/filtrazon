@@ -98,15 +98,6 @@ export function generateMockReading(overrides: Partial<Reading> = {}): Reading {
   }
 }
 
-// ── Generate N historical readings — DB-like response ──────────────
-// Produces realistic variation: mostly safe, some warnings, occasional danger
-export async function generateMockHistory(
-  count = 100,
-  intervalMs = 5000,
-): Promise<Reading[]> {
-  const now = Date.now()
-  const readings: Reading[] = []
-
 // ── Nilai dummy yang disediakan — cycling berulang ─────────────────
 export const DUMMY_PH   = [6.8, 7.8, 7.6, 7.9, 8.4]
 export const DUMMY_TURB = [2.1, 2.5, 2.4, 1.9, 2.9]
@@ -125,6 +116,15 @@ export function getLatestDummyWater(seq = 0) {
     flow_lpm: DUMMY_FLOW,
   }
 }
+
+// ── Generate N historical readings — DB-like response ──────────────
+// Produces realistic variation: mostly safe, some warnings, occasional danger
+export async function generateMockHistory(
+  count = 100,
+  intervalMs = 5000,
+): Promise<Reading[]> {
+  const now = Date.now()
+  const readings: Reading[] = []
 
   // Ambil data terbaru dari Firebase sebagai basis nilai paling baru
   let basePh   = DUMMY_PH[0]
